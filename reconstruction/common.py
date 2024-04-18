@@ -39,7 +39,7 @@ PROMPT_TEMPLATES = {
 
 MODEL_NAME_OR_PATH_TO_NAME = {
     "lmsys/vicuna-7b-v1.3": "vicuna",
-    "lmsys/vicuna-7b-v1.5": "vicuna",
+    "/data/models/vicuna/vicuna-7b-v1.5": "vicuna",
     "vicuna": "vicuna",
     "facebook/opt-350m": "opt",
     "facebook/opt-1.3b": "opt",
@@ -56,6 +56,8 @@ MODEL_NAME_OR_PATH_TO_NAME = {
     "EleutherAI/pythia-12b": "pythia",
     "pythia": "pythia",
     "openlm-research/open_llama_3b_v2": "openllama",
+    "/data/models/hf/Llama-2-7b-hf": "openllama",
+    "/data/models/hf/Llama-2-7b-chat-hf": "Llama-2-7b-chat-hf"
 }
 
 DEVICE_MAPS = {
@@ -170,6 +172,42 @@ def build_prompt(
     return prompt_ids, suffix_slice
 
 
+
+def build_context_prompt(
+    model_name: str, context: str, prompt: str, tokenizer: PreTrainedTokenizer
+) -> tuple[torch.Tensor, slice]:
+    """
+    Given the actual "suffix" (prompt), add in the prefix/suffix for the given instruction tuned model
+
+    Parameters
+    ----------
+        model_name: str
+            Model name or path
+        suffix: str
+            The actual prompt to wrap around
+        tokenizer: PreTrainedTokenizer
+            Tokenizer for the model
+
+    Returns
+    -------
+        tuple[torch.Tensor, slice]
+            Tuple of the prompt ids and the slice of the actual prompt (suffix)
+    """
+
+    model_name = MODEL_NAME_OR_PATH_TO_NAME[model_name]
+    cur_prompt = PROMPT_TEMPLATES[model_name]["prefix"]
+    cur_prompt = cur_prompt + context
+    #cur_prompt = PROMPT_TEMPLATES[model_name]["prefix"]
+    suffix_start_idx = max(len(tokenizer(cur_prompt)["input_ids"]) + 1, 0)
+    cur_prompt = cur_prompt + prompt
+    suffix_end_idx = len(tokenizer(cur_prompt)["input_ids"])
+    cur_prompt = cur_prompt + PROMPT_TEMPLATES[model_name]["suffix"]
+
+    prompt_ids = tokenizer(cur_prompt, return_tensors="pt")["input_ids"]
+    suffix_slice = slice(suffix_start_idx, suffix_end_idx)
+    return prompt_ids, suffix_slice
+
+
 def gen_suffix_from_template(
     model_name: str, prompt: str, suffix_char: str, suffix_len: int
 ) -> tuple[str, str]:
@@ -246,6 +284,7 @@ def load_models_tokenizers_parallel(
         if (
             "vicuna" in MODEL_NAME_OR_PATH_TO_NAME[model_name_or_path]
             or "llama" in MODEL_NAME_OR_PATH_TO_NAME[model_name_or_path]
+            or "Llama" in MODEL_NAME_OR_PATH_TO_NAME[model_name_or_path]
         ):
             dmap = DEVICE_MAPS["llama_for_causal_lm_2_gpus"]
         elif "pythia" in MODEL_NAME_OR_PATH_TO_NAME[model_name_or_path]:
@@ -253,6 +292,7 @@ def load_models_tokenizers_parallel(
 
         for device0, device1 in split_model_gpus:
             cur_dmap = {k: device0 if v == 0 else device1 for k, v in dmap.items()}
+            print(cur_dmap)
             model, tokenizer = load_model_tokenizer(
                 model_name_or_path, fp16, device_map=cur_dmap
             )
@@ -276,8 +316,8 @@ def setup_multiproc_env(split_models: bool = False):
     n_procs = (
         torch.cuda.device_count() // 2 if split_models else torch.cuda.device_count()
     )
+    n_procs = 1 # we added to make sure it doesn't use any multiprocs
     pool = mp.Pool(processes=n_procs)
-
     return pool
 
 

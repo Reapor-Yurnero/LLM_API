@@ -104,7 +104,7 @@ class Reconstructor(object):
 
     def log_prob_docs(
         self,
-        prompt_ids_or_embs: torch.Tensor,
+        prompt_ids_or_embs: list,
         docs: torch.Tensor,
         prompt_attn_mask: Optional[torch.Tensor],
         docs_attn_mask: Optional[torch.Tensor],
@@ -132,34 +132,41 @@ class Reconstructor(object):
                 Tensor of shape num_docs for the log prob. of each doc
         """
 
-        assert len(prompt_ids_or_embs.shape) == 2 or len(prompt_ids_or_embs.shape) == 3
+        # assert len(prompt_ids_or_embs.shape) == 2 or len(prompt_ids_or_embs.shape) == 3
 
-        if len(prompt_ids_or_embs.shape) == 2:
-            prompt_embs = self.model.get_input_embeddings()(
-                prompt_ids_or_embs.to(self.model.device)
-            )
-        else:
-            prompt_embs = prompt_ids_or_embs
+        # if len(prompt_ids_or_embs.shape) == 2:
+        #     prompt_embs = self.model.get_input_embeddings()(
+        #         prompt_ids_or_embs.to(self.model.device)
+        #     )
+        # else:
+        #     prompt_embs = prompt_ids_or_embs
 
-        assert (
-            len(docs.shape) == 2
-        ), "docs should be tensor of shape (num_docs, max_len)"
-        prompt_len = prompt_embs.shape[1]
-        assert (
-            prompt_len > 0
-        ), "There must be at least one token in the prompt, even if it is just the BOS token"
+        # assert (
+        #     len(docs.shape) == 2
+        # ), "docs should be tensor of shape (num_docs, max_len)"
+        # prompt_len = prompt_embs.shape[1]
+        # assert (
+        #     prompt_len > 0
+        # ), "There must be at least one token in the prompt, even if it is just the BOS token"
 
         log_prob_docs = torch.zeros(
-            docs.shape[0], dtype=torch.float32, device=self.model.device
+            len(docs), dtype=torch.float32, device=self.model.device
         )
 
-        for i in range(0, docs.shape[0], self.batch_size):
-            cur_batch_size = min(self.batch_size, docs.shape[0] - i)
-            cur_docs = docs[i : i + cur_batch_size].to(self.model.device)
+        for i in range(len(docs)):
+            prompt_len = prompt_ids_or_embs[i].size(1)
+            cur_prompt_embs = self.model.get_input_embeddings()( prompt_ids_or_embs[i].to(self.model.device) )
+            cur_docs = docs[i].to(self.model.device)
             cur_docs_embs = self.model.get_input_embeddings()(cur_docs)
-            cur_prompt_embs = prompt_embs.clone()
-            cur_prompt_embs = cur_prompt_embs.repeat(cur_docs.shape[0], 1, 1)
             cur_prompt_docs_embs = torch.cat((cur_prompt_embs, cur_docs_embs), dim=1)
+            cur_batch_size = 1
+
+            # cur_batch_size = min(self.batch_size, docs.shape[0] - i)
+            # cur_docs = docs[i : i + cur_batch_size].to(self.model.device)
+            # cur_docs_embs = self.model.get_input_embeddings()(cur_docs)
+            # cur_prompt_embs = prompt_embs.clone()
+            # cur_prompt_embs = cur_prompt_embs.repeat(cur_docs.shape[0], 1, 1)
+            # cur_prompt_docs_embs = torch.cat((cur_prompt_embs, cur_docs_embs), dim=1)
 
             cur_attn_masks = None
             if prompt_attn_mask is not None and docs_attn_mask is not None:
@@ -190,6 +197,23 @@ class Reconstructor(object):
             log_prob_docs[i : i + cur_batch_size] = torch.sum(output, dim=-1)
 
         return log_prob_docs
+
+    def log_prob_prompt_all(
+        self,
+        prompt_ids,
+        suffix_slices,
+    ) -> float:
+        outputs = []
+        #print(len(prompt_ids))
+        #assert 0
+        return torch.tensor(0.00)
+        for i in range(len(prompt_ids)):
+            curr_id = prompt_ids[i]
+            curr_slice = suffix_slices[i]
+            outputs.append(self.log_prob_prompt(curr_id, curr_slice))
+        return torch.mean(torch.tensor(outputs))
+
+
 
     def log_prob_prompt(
         self,
@@ -230,9 +254,10 @@ class Reconstructor(object):
     @torch.no_grad()
     def compute_kl(
         self,
-        prompt1: torch.Tensor,
-        prompt2: torch.Tensor,
-        docs: torch.Tensor,
+        prompt1: list,
+        prompt2: list,
+        docs1: list,
+        docs2: list,
         docs_attn_mask: Optional[torch.Tensor],
         p1_attn_mask: Optional[
             torch.Tensor
@@ -240,6 +265,7 @@ class Reconstructor(object):
         p2_attn_mask: Optional[torch.Tensor],
         return_kls: bool = False,
     ) -> tuple[float, float]:
+        return float("inf"), float("inf")
         """
         Estimate KL divergence b/w p1 and p2 given all docs D_i drawn from prompt1
         dist_KL = 1/n * sum_{i=1}^n log(P(D_i | prompt1)) - log(P(D_i | prompt2))
@@ -268,7 +294,7 @@ class Reconstructor(object):
         # Compute log P(D_i | prompt1)
         log_p1 = self.log_prob_docs(
             prompt_ids_or_embs=prompt1,
-            docs=docs,
+            docs=docs1,
             prompt_attn_mask=p1_attn_mask,
             docs_attn_mask=docs_attn_mask,
         )
@@ -276,7 +302,7 @@ class Reconstructor(object):
         # Compute log P(D_i | prompt2)
         log_p2 = self.log_prob_docs(
             prompt_ids_or_embs=prompt2,
-            docs=docs,
+            docs=docs2,
             prompt_attn_mask=p2_attn_mask,
             docs_attn_mask=docs_attn_mask,
         )

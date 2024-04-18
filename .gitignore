@@ -16,3 +16,6 @@ eval_arc*.txt
 *log*
 .hypothesis/
 *egg-info*
+results/
+evaluations/
+_*

@@ -71,8 +71,10 @@ if __name__ == "__main__":
     parser.add_argument("--dataset_path", type=str)
     parser.add_argument("--output_dir", type=str)
     parser.add_argument("--batch_size", type=int)
+    parser.add_argument("--subset_size", type=int)
+    parser.add_argument("--exp_name", type=str, default="exp_undefined")
     parser.add_argument("--top_k", type=int, default=250)
-    parser.add_argument("--n_proposals", type=int, default=100)
+    parser.add_argument("--n_proposals", type=int, default=1)
     parser.add_argument("--natural_prompt_penalty", type=float, default=0.0)
     parser.add_argument("--num_epochs", type=int)
     parser.add_argument("--kl_every", type=int, default=5)
@@ -108,9 +110,16 @@ if __name__ == "__main__":
             args.model_name_or_path, args.fp16
         )
 
+
     Path(args.output_dir).mkdir(parents=True, exist_ok=True)
     dataset = pickle.load(open(args.dataset_path, "rb"))
     dataset_per_proc = common.split_for_multiproc(dataset, n_procs)
+
+    from datetime import datetime
+    now = datetime.now()
+    outfile_prefix = os.path.join(args.output_dir, f"hard_results_{args.exp_name}_{now.month}_{now.day}_{now.hour}_{now.minute}".replace(' ', '_'))
+    with open(outfile_prefix+'.log', 'w') as f:
+        f.write(f"{args}\n")
 
     reconstructors = []
     for i in range(n_procs):
@@ -128,12 +137,14 @@ if __name__ == "__main__":
             args.num_epochs,
             args.top_k,
             args.n_proposals,
+            args.subset_size,
             args.natural_prompt_penalty,
             args.clip_vocab,
             args.warm_start_file,
+            outfile_prefix,
             **reconstruct_args,
         )
-        reconstructor.load_datasets(dataset_per_proc[i], True, True)
+        reconstructor.load_datasets(dataset_per_proc[i], True, False)
 
         if args.sharded:
             del reconstruct_args["model"]
@@ -147,6 +158,7 @@ if __name__ == "__main__":
     print("Running hard prompt experiments")
     print(f"Number of prompts: {len(dataset)}")
     print(f"Number of trials: {args.n_trials}")
+    print(f"Number of process: {n_procs}")
 
     # This is the workaround i came up with for not being able to pickle the model if its sharded across GPUs
     # the workers will load the model each time they are called, then delete it after... so hacky lmao
@@ -157,25 +169,33 @@ if __name__ == "__main__":
 
     results: list = []
     for i in range(args.n_trials):
-        for j in range(n_procs):
-            results.append(
-                pool.apply_async(
-                    reconstructor_worker,
-                    (
-                        reconstructors[j],
-                        args.model_name_or_path,
-                        sharding_list[j] if args.sharded else None,
-                        args.output_dir,
-                        i,
-                    ),
+        if n_procs > 1:
+            for j in range(n_procs):
+                results.append(
+                    pool.apply_async(
+                        reconstructor_worker,
+                        (
+                            reconstructors[j],
+                            args.model_name_or_path,
+                            sharding_list[j] if args.sharded else None,
+                            args.output_dir,
+                            i,
+                        ),
+                    )
                 )
-            )
+        else: # no pool if one procs
+            reconstructor_worker(
+                reconstructors[0],
+                args.model_name_or_path,
+                sharding_list[0] if args.sharded else None,
+                args.output_dir,
+                i)
 
     pool.close()
     pool.join()
-    results = [x.get() for x in results]
-    results_flat = [x for sublist in results for x in sublist]
+    # results = [x.get() for x in results]
+    # results_flat = [x for sublist in results for x in sublist]
 
-    print("Saving results...")
-    with open(os.path.join(args.output_dir, "hard_results.json"), "w") as f:
-        json.dump(results_flat, f, indent=4, ensure_ascii=False)
+    # print("Saving results...")
+    # with open(outfile_prefix+'.json', "w") as f:
+    #     json.dump(results_flat, f, indent=4, ensure_ascii=False)
