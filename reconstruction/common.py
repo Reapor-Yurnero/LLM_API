@@ -1,10 +1,13 @@
+from cmd import PROMPT
 from transformers import AutoModelForCausalLM, AutoTokenizer, PreTrainedTokenizer
 import torch
 import gc
 import multiprocessing as mp
 import os
-from typing import Optional
+from typing import List, Optional
 
+# SYS_PROMPT = "You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe.  Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature. If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information."
+SYS_PROMPT = "You are a helpful, respectful and honest assistant. If you don't know the answer to a question, please don't share false information."
 
 PROMPT_TEMPLATES = {
     "vicuna": {
@@ -12,7 +15,7 @@ PROMPT_TEMPLATES = {
         "suffix": "\nASSISTANT:",
     },
     "Llama-2-7b-chat-hf": {
-        "prefix": "[INST] <<SYS>>\nYou are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe.  Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature. If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.\n<</SYS>>\n\n",
+        "prefix": f"[INST] <<SYS>>\n{SYS_PROMPT}\n<</SYS>>\n\n",
         "suffix": " [/INST]",
     },
     "opt": {
@@ -35,7 +38,87 @@ PROMPT_TEMPLATES = {
         "prefix": "",
         "suffix": "",
     },
+    "Llama-3":{
+        "prefix": f"<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n{SYS_PROMPT}<|eot_id|><|start_header_id|>user<|end_header_id|>\n\n",
+        "suffix": "<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n",
+    }
 }
+
+
+def llama3_prompt_template(context: List[dict], prompt: str, tokenizer: PreTrainedTokenizer | None, return_tensor ='pt') -> List[List[int] | str]:
+    identity_dict = {'human': 'user',  'gpt': 'assistant', 'system': 'system'}
+    # sys prompt and begin oftext
+    prompt_str = f"<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n{SYS_PROMPT.strip()}<|eot_id|>"
+    # multiturn context
+    for conversation in context: 
+        prompt_str += '<|start_header_id|>'
+        prompt_str += identity_dict[conversation['from']]
+        prompt_str += '<|end_header_id|>\n\n'
+        prompt_str += conversation['value'].strip()
+        prompt_str += '<|eot_id|>'
+    # current user response
+    prompt_str += '<|start_header_id|>'
+    prompt_str += 'user'
+    prompt_str += '<|end_header_id|>\n\n'
+    # adversarial suffix
+    if tokenizer: 
+        prompt_ids = tokenizer.encode(prompt_str)
+        suffix_start_idx = len(prompt_ids)
+    prompt_str += prompt.strip()
+    if tokenizer:
+        prompt_ids.extend(tokenizer.encode(prompt.strip()))
+        suffix_end_idx = len(prompt_ids)
+    # assistant start
+    prompt_str += '<|eot_id|>'
+    prompt_str += '<|start_header_id|>'
+    prompt_str += 'assistant'
+    prompt_str += '<|end_header_id|>\n\n'
+    if tokenizer:
+        prompt_ids = tokenizer.encode(prompt_str, return_tensors=return_tensor)
+        suffix_slice = slice(suffix_start_idx, suffix_end_idx)
+        return prompt_ids, suffix_slice 
+    return prompt_str
+
+
+def llama2_prompt_template(context: List[dict], prompt: str, tokenizer: PreTrainedTokenizer | None, return_tensor ='pt') -> List[List[int] | str]:
+    # multiturn context
+    prompt_str = ''
+    for idx, conversation in enumerate(context): 
+        if conversation['from'] == 'human': # user 
+            if idx == 0:    # sys prompt and begin of text
+                prompt_str += f"<s> [INST] <<SYS>>\n{SYS_PROMPT}\n<</SYS>>\n\n"
+            else:
+                prompt_str += '<s> [INST] '
+            prompt_str += conversation['value'].strip()
+            prompt_str += ' [/INST]'
+        else: # assistant
+            prompt_str += conversation['value'].strip()
+            prompt_str += '</s>'
+    # current user response
+    prompt_str += '<s> [INST] '
+    # adversarial suffix
+    if tokenizer: 
+        prompt_ids = tokenizer.encode(prompt_str)
+        suffix_start_idx = len(prompt_ids)
+    prompt_str += prompt.strip()
+    if tokenizer:
+        prompt_ids.extend(tokenizer.encode(prompt.strip()))
+        suffix_end_idx = len(prompt_ids)
+    # assistant start
+    prompt_str += ' [/INST]'
+    if tokenizer:
+        prompt_ids = tokenizer.encode(prompt_str, return_tensors=return_tensor)
+        suffix_slice = slice(suffix_start_idx, suffix_end_idx)
+        return prompt_ids, suffix_slice 
+    return prompt_str
+
+
+PROMPTTEMPLATE_HANDLER =  {
+    'Llama-3': llama3_prompt_template,
+    'Llama-2': llama2_prompt_template,
+    'mistral': llama2_prompt_template
+    }
+
 
 MODEL_NAME_OR_PATH_TO_NAME = {
     "lmsys/vicuna-7b-v1.3": "vicuna",
@@ -57,7 +140,9 @@ MODEL_NAME_OR_PATH_TO_NAME = {
     "pythia": "pythia",
     "openlm-research/open_llama_3b_v2": "openllama",
     "/data/models/hf/Llama-2-7b-hf": "openllama",
-    "/data/models/hf/Llama-2-7b-chat-hf": "Llama-2-7b-chat-hf"
+    "/data/models/hf/Llama-2-7b-chat-hf": "Llama-2-7b-chat-hf",
+    "/data/models/hf/Meta-Llama-3-8B-Instruct": "Llama-3",
+    "/data/models/hf/Mistral-7B-v0.3": "mistral"
 }
 
 DEVICE_MAPS = {
@@ -138,7 +223,7 @@ DEVICE_MAPS = {
     },
 }
 
-
+# not used 
 def build_prompt(
     model_name: str, suffix: str, tokenizer: PreTrainedTokenizer
 ) -> tuple[torch.Tensor, slice]:
@@ -195,6 +280,10 @@ def build_context_prompt(
     """
 
     model_name = MODEL_NAME_OR_PATH_TO_NAME[model_name]
+
+    if isinstance(context, List):
+        return PROMPTTEMPLATE_HANDLER[model_name](context, prompt, tokenizer)
+
     cur_prompt = PROMPT_TEMPLATES[model_name]["prefix"]
     cur_prompt = cur_prompt + context
     #cur_prompt = PROMPT_TEMPLATES[model_name]["prefix"]
@@ -248,7 +337,7 @@ def free_cuda_memory():
 def load_model_tokenizer(
     model_name_or_path: str,
     fp16: bool = True,
-    device_map: str | dict = "auto",
+    device_map = "auto",
 ) -> tuple[AutoModelForCausalLM, PreTrainedTokenizer]:
     model = AutoModelForCausalLM.from_pretrained(
         model_name_or_path,
