@@ -4,7 +4,7 @@ llm_data/
 .ipynb_checkpoints/
 __pycache__/
 .DS_Store
-*.pkl
+# *.pkl
 *.pt
 unused/
 temp.ipynb

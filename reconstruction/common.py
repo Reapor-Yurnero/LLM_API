@@ -387,6 +387,11 @@ def load_models_tokenizers_parallel(
             )
             models.append(model)
             tokenizers.append(tokenizer)
+        # model, tokenizer = load_model_tokenizer(
+        #         model_name_or_path, fp16, device_map="auto"
+        #     )
+        # models.append(model)
+        # tokenizers.append(tokenizer)
 
     else:
         for i in range(torch.cuda.device_count()):

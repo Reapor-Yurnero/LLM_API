@@ -94,6 +94,7 @@ if __name__ == "__main__":
     parser.add_argument("--n_trials", type=int, default=10)
     parser.add_argument("--sharded", action="store_true")
     parser.add_argument("--fp16", action="store_true")
+    parser.add_argument("--start_from_scratch", action="store_true")
 
     args = parser.parse_args()
 
@@ -110,6 +111,12 @@ if __name__ == "__main__":
             args.model_name_or_path, args.fp16
         )
 
+    # from accelerate import Accelerator
+    # accelerator = Accelerator()
+
+    # models, dl = accelerator.prepare(
+    #     models, dl
+    # )
 
     Path(args.output_dir).mkdir(parents=True, exist_ok=True)
     dataset = pickle.load(open(args.dataset_path, "rb"))
@@ -144,7 +151,8 @@ if __name__ == "__main__":
             outfile_prefix,
             **reconstruct_args,
         )
-        reconstructor.load_datasets(dataset_per_proc[i], True, False)
+        # reconstructor.accelerator = accelerator
+        reconstructor.load_datasets(dataset_per_proc[i], True, False, args.start_from_scratch)
 
         if args.sharded:
             del reconstruct_args["model"]

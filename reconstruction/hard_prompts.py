@@ -207,14 +207,15 @@ class HardReconstructorGCG(Reconstructor):
                 )
                 embs_list.append(full_embs)
 
-            embs_list = batch_embs(embs_list)
+            embs_list = self.batch_embs(embs_list)
             logits = self.model(inputs_embeds=embs_list).logits
 
             loss_fct = torch.nn.CrossEntropyLoss(ignore_index=IGNORE_INDEX)
 
-            targets_list = batch_targets(targets_list)
+            targets_list = self.batch_targets(targets_list)
             logits = batch_logits(logits, loss_slices, targets_list.size(1))
             loss = loss_fct(logits.transpose(1, 2), targets_list)
+            # self.accelerator.backward(loss)
             loss.backward()
 
             for i in range(j, j + cur_batch_size):
@@ -294,9 +295,14 @@ class HardReconstructorGCG(Reconstructor):
                     )
                     embs_list.append(proposal_embs)
 
-                embs_list = batch_embs(embs_list)
+                embs_list = self.batch_embs(embs_list)
                 #targets_list = batch_targets(targets_list)
                 #cur_time = time.time()
+                # ds = torch.utils.data.DataLoader(embs_list)
+                # # self.model = self.accelerator.unwrap_model(self.model)
+                # self.model, ds = self.accelerator.prepare(self.model, ds)
+                # # ds = self.accelerator.prepare(ds)
+                # for embs_list in ds:
                 logits = self.model(inputs_embeds=embs_list).logits
                 #print(logits.size())
                 #assert 0
@@ -438,6 +444,7 @@ class HardReconstructorGCG(Reconstructor):
         dataset: str | list,
         suffix_only: bool,
         load_doc_tensors: bool = True,
+        start_from_scratch = False
     ) -> None:
         """
         Load a dataset from a pickle file into the reconstructor
@@ -498,7 +505,8 @@ class HardReconstructorGCG(Reconstructor):
                 #all_suffix_slices.append( slice(0, prompt_ids[-1].shape[-1]) )
                 #print(self.tokenizer.decode( context_prompt[:, train_slice].squeeze(0) ))
 
-                context_prompt[:, train_slice] = 1738
+                if start_from_scratch:
+                    context_prompt[:, train_slice] = 1738
                 train_prompt_ids.append(context_prompt)
                 train_suffix_slices.append(train_slice)
 
@@ -710,27 +718,27 @@ Loss: {loss_0[0]:.2f}\n""")
         }
 
 
-def batch_embs(embs, max_len = None):
-    len_list = [embs[i].size(1) for i in range(len(embs))]
-    if not max_len:
-        max_len = max(len_list)
+    def batch_embs(self, embs, max_len = None):
+        len_list = [embs[i].size(1) for i in range(len(embs))]
+        if not max_len:
+            max_len = max(len_list)
 
-    for i in range(len(embs)):
-        padding = torch.zeros((1, max_len - len_list[i], embs[i].size(2)) ).to(embs[i].device).type(embs[i].dtype)
-        embs[i] = torch.cat([embs[i], padding], dim = 1)
-    embs = torch.cat(embs, dim = 0)
-    return embs
+        for i in range(len(embs)):
+            padding = torch.zeros((1, max_len - len_list[i], embs[i].size(2)) ).to(embs[i].device).type(embs[i].dtype)
+            embs[i] = torch.cat([embs[i], padding], dim = 1)
+        embs = torch.cat(embs, dim = 0)
+        return embs
 
-def batch_targets(targets, max_len = None):
-    len_list = [targets[i].size(1) for i in range(len(targets))]
-    if not max_len:
-        max_len = max(len_list)
+    def batch_targets(self, targets, max_len = None):
+        len_list = [targets[i].size(1) for i in range(len(targets))]
+        if not max_len:
+            max_len = max(len_list)
 
-    for i in range(len(targets)):
-        padding = torch.ones((1, max_len - targets[i].size(1))).to(targets[i].device).type(targets[i].dtype) * IGNORE_INDEX
-        targets[i] = torch.cat([targets[i], padding], dim = 1)
-    targets = torch.cat(targets, dim = 0)
-    return targets
+        for i in range(len(targets)):
+            padding = torch.ones((1, max_len - targets[i].size(1))).to(targets[i].device).type(targets[i].dtype) * IGNORE_INDEX
+            targets[i] = torch.cat([targets[i], padding], dim = 1)
+        targets = torch.cat(targets, dim = 0)
+        return targets
 
 
 def batch_logits(logits, slices, len_targets):
