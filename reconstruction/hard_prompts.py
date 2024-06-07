@@ -700,7 +700,7 @@ Loss: {loss_0[0]:.2f}\n""")
                         }
                     )
                     with open(self.outfile_prefix+".log", "a") as f:
-                        f.write(f"Epoch: {i+1}; Suffix: {suf.encode('utf-8').decode('utf-8')}\nloss:{loss:.2f}; Best KL={best_kl:.2f}; Curr KL={kl:.2f}+-{std_dev:.2f};Logprob. prompt={log_prob_prompt:.2f}\nBest loss so far: {best_loss} at epoch {best_loss_epoch}. Average Epoch Speed: {pbar.format_dict['rate']}\n")
+                        f.write(f"Epoch: {i+1}; Suffix: {suf.encode('utf-8')}\nloss:{loss:.2f}; Best KL={best_kl:.2f}; Curr KL={kl:.2f}+-{std_dev:.2f};Logprob. prompt={log_prob_prompt:.2f}\nBest loss so far: {best_loss} at epoch {best_loss_epoch}. Average Epoch Speed: {pbar.format_dict['rate']}\n")
                     with open(self.outfile_prefix+'.pkl', 'wb') as f:
                         pickle.dump(pq, f)
 
