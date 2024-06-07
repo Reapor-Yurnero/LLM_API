@@ -208,7 +208,10 @@ class HardReconstructorGCG(Reconstructor):
                 embs_list.append(full_embs)
 
             embs_list = self.batch_embs(embs_list)
-            logits = self.model(inputs_embeds=embs_list).logits
+            if 'glm' in self.model.name_or_path:
+                logits = self.model(input_ids=torch.ones((embs_list.shape[0], embs_list.shape[1])).to(self.model.device), inputs_embeds=embs_list).logits # temporary workaround before glm fix this (currently it doesnt support inputembed only)
+            else:
+                logits = self.model(inputs_embeds=embs_list).logits
 
             loss_fct = torch.nn.CrossEntropyLoss(ignore_index=IGNORE_INDEX)
 
@@ -303,7 +306,11 @@ class HardReconstructorGCG(Reconstructor):
                 # self.model, ds = self.accelerator.prepare(self.model, ds)
                 # # ds = self.accelerator.prepare(ds)
                 # for embs_list in ds:
-                logits = self.model(inputs_embeds=embs_list).logits
+                if 'glm' in self.model.name_or_path:
+                    logits = self.model(input_ids=torch.ones((embs_list.shape[0], embs_list.shape[1])).to(self.model.device), inputs_embeds=embs_list).logits # temporary workaround before glm fix this (currently it doesnt support inputembed only)
+                else:
+                    logits = self.model(inputs_embeds=embs_list).logits
+
                 #print(logits.size())
                 #assert 0
                 #print("batch forward", str(time.time() - cur_time))
@@ -444,7 +451,8 @@ class HardReconstructorGCG(Reconstructor):
         dataset: str | list,
         suffix_only: bool,
         load_doc_tensors: bool = True,
-        start_from_scratch = False
+        start_from_scratch = False,
+        start_from_file: str = '',
     ) -> None:
         """
         Load a dataset from a pickle file into the reconstructor
@@ -507,6 +515,11 @@ class HardReconstructorGCG(Reconstructor):
 
                 if start_from_scratch:
                     context_prompt[:, train_slice] = 1738
+                elif start_from_file:
+                    import pickle
+                    top_suffix = pickle.load(open(start_from_file,'rb'))[-1][3] # -1 means the last entry i.e. the best suffix 3 -> tokens of the suffix
+                    context_prompt[:, train_slice] = top_suffix
+                    # self.tokenizer.encode(top_suffix, return_tensors='pt').squeeze()
                 train_prompt_ids.append(context_prompt)
                 train_suffix_slices.append(train_slice)
 
@@ -650,18 +663,17 @@ Loss: {loss_0[0]:.2f}\n""")
 
                 cur_time = time.time()
                 best_proposal, loss = self.gcg_replace_tok(current_sample)
-
                 train_sample.update_suffix(best_proposal)
-                suf = self.tokenizer.decode(train_sample.prompt_ids[0][0][train_sample.suffix_slice[0]])  # current suffix
+                suf = self.tokenizer.decode(best_proposal)  # current suffix
 
                 if loss < best_loss:
                     best_loss = loss
                     best_loss_epoch = i
 
                 if len(pq) < 5:
-                    heapq.heappush(pq, (-loss, suf, i))
+                    heapq.heappush(pq, (-loss, suf, i, best_proposal))
                 else:
-                    heapq.heappushpop(pq, (-loss, suf, i))
+                    heapq.heappushpop(pq, (-loss, suf, i, best_proposal))
                     
                 if (i + 1) % self.kl_every == 0:
                     kl, std_dev = self.compute_kl(
@@ -688,7 +700,7 @@ Loss: {loss_0[0]:.2f}\n""")
                         }
                     )
                     with open(self.outfile_prefix+".log", "a") as f:
-                        f.write(f"Epoch: {i+1}; Suffix: {suf}\nloss:{loss:.2f}; Best KL={best_kl:.2f}; Curr KL={kl:.2f}+-{std_dev:.2f};Logprob. prompt={log_prob_prompt:.2f}\nBest loss so far: {best_loss} at epoch {best_loss_epoch}. Average Epoch Speed: {pbar.format_dict['rate']}\n")
+                        f.write(f"Epoch: {i+1}; Suffix: {suf.encode('utf-8').decode('utf-8')}\nloss:{loss:.2f}; Best KL={best_kl:.2f}; Curr KL={kl:.2f}+-{std_dev:.2f};Logprob. prompt={log_prob_prompt:.2f}\nBest loss so far: {best_loss} at epoch {best_loss_epoch}. Average Epoch Speed: {pbar.format_dict['rate']}\n")
                     with open(self.outfile_prefix+'.pkl', 'wb') as f:
                         pickle.dump(pq, f)
 

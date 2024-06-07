@@ -45,6 +45,30 @@ PROMPT_TEMPLATES = {
 }
 
 
+def find_sub_list(sl,l):
+    sll=len(sl)
+    for ind in (i for i,e in enumerate(l) if e==sl[0]):
+        if l[ind:ind+sll]==sl:
+            return slice(ind,ind+sll)
+        
+
+def prompt_template_handler(model: str, context: List[dict], prompt: str, tokenizer: PreTrainedTokenizer | None, return_tensor='pt') -> List[List[int] | str]:
+    prompt = prompt.strip()
+    if 'mistral' in model or 'mixtral' in model:
+        return llama2_prompt_template(context, prompt, tokenizer, return_tensor)
+    
+    context = [{'role': 'system', 'content': SYS_PROMPT}] + context
+    context.append({'role': 'user', 'content': prompt})
+
+    full_tokens = tokenizer.apply_chat_template(context, add_generation_prompt=True, tokenize=True, return_tensors=return_tensor)
+    prompt_token_ids = tokenizer.encode(prompt, add_special_tokens=False)
+    
+    suffix_slice = find_sub_list(prompt_token_ids, list(full_tokens)[0] if return_tensor != 'pt' else full_tokens.squeeze().tolist()) 
+    # [0] since we only have one Conversation so we should always squeeze the output
+    assert suffix_slice
+    return full_tokens, suffix_slice
+
+
 def llama3_prompt_template(context: List[dict], prompt: str, tokenizer: PreTrainedTokenizer | None, return_tensor ='pt') -> List[List[int] | str]:
     identity_dict = {'human': 'user',  'gpt': 'assistant', 'system': 'system'}
     # sys prompt and begin oftext
@@ -142,7 +166,8 @@ MODEL_NAME_OR_PATH_TO_NAME = {
     "/data/models/hf/Llama-2-7b-hf": "openllama",
     "/data/models/hf/Llama-2-7b-chat-hf": "Llama-2-7b-chat-hf",
     "/data/models/hf/Meta-Llama-3-8B-Instruct": "Llama-3",
-    "/data/models/hf/Mistral-7B-v0.3": "mistral"
+    "/data/models/hf/Mistral-7B-v0.3": "mistral",
+    "/data/models/hf/glm-4-9b-chat": "glm"
 }
 
 DEVICE_MAPS = {
@@ -282,7 +307,7 @@ def build_context_prompt(
     model_name = MODEL_NAME_OR_PATH_TO_NAME[model_name]
 
     if isinstance(context, List):
-        return PROMPTTEMPLATE_HANDLER[model_name](context, prompt, tokenizer)
+        return prompt_template_handler(model_name, context, prompt, tokenizer)
 
     cur_prompt = PROMPT_TEMPLATES[model_name]["prefix"]
     cur_prompt = cur_prompt + context
@@ -342,10 +367,10 @@ def load_model_tokenizer(
     model = AutoModelForCausalLM.from_pretrained(
         model_name_or_path,
         device_map=device_map,
-        torch_dtype=torch.float16 if fp16 else torch.float32,
+        torch_dtype=torch.bfloat16 if fp16 else torch.float32,
         trust_remote_code=True,
     )
-    tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
+    tokenizer = AutoTokenizer.from_pretrained(model_name_or_path, trust_remote_code=True)
 
     return model, tokenizer
 

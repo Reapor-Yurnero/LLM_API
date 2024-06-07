@@ -77,7 +77,7 @@ if __name__ == "__main__":
     parser.add_argument("--n_proposals", type=int, default=1)
     parser.add_argument("--natural_prompt_penalty", type=float, default=0.0)
     parser.add_argument("--num_epochs", type=int)
-    parser.add_argument("--kl_every", type=int, default=5)
+    parser.add_argument("--kl_every", type=int, default=1)
     parser.add_argument(
         "--optim_suffix_len",
         type=int,
@@ -95,6 +95,7 @@ if __name__ == "__main__":
     parser.add_argument("--sharded", action="store_true")
     parser.add_argument("--fp16", action="store_true")
     parser.add_argument("--start_from_scratch", action="store_true")
+    parser.add_argument("--start_from_file", type=str, default='')
 
     args = parser.parse_args()
 
@@ -152,7 +153,7 @@ if __name__ == "__main__":
             **reconstruct_args,
         )
         # reconstructor.accelerator = accelerator
-        reconstructor.load_datasets(dataset_per_proc[i], True, False, args.start_from_scratch)
+        reconstructor.load_datasets(dataset_per_proc[i], True, False, args.start_from_scratch, args.start_from_file)
 
         if args.sharded:
             del reconstruct_args["model"]
