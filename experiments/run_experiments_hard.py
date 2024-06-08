@@ -85,7 +85,8 @@ if __name__ == "__main__":
         help="length of prompt to optimize, if warm start is provided this isn't used",
     )
     parser.add_argument("--init_prompt_char", type=str, default="!")
-    parser.add_argument("--clip_vocab", action="store_true")
+    parser.add_argument("--clip_vocab", action="store_true") #deprecated now!
+    parser.add_argument("--vocab", type=str, default="non_english", choices = ["english", "non_english", "all_allow"])
     parser.add_argument(
         "--warm_start_file",
         type=str,
@@ -125,7 +126,7 @@ if __name__ == "__main__":
 
     from datetime import datetime
     now = datetime.now()
-    outfile_prefix = os.path.join(args.output_dir, f"hard_results_{args.exp_name}_{now.month}_{now.day}_{now.hour}_{now.minute}".replace(' ', '_'))
+    outfile_prefix = os.path.join(args.output_dir, f"hard_results_{args.exp_name}_{now.strftime('%b')}_{now.day}_{now.hour}_{now.minute}".replace(' ', '_'))
     with open(outfile_prefix+'.log', 'w') as f:
         f.write(f"{args}\n")
 
@@ -147,13 +148,14 @@ if __name__ == "__main__":
             args.n_proposals,
             args.subset_size,
             args.natural_prompt_penalty,
-            args.clip_vocab,
+            args.vocab,
             args.warm_start_file,
             outfile_prefix,
+            args.start_from_file,
             **reconstruct_args,
         )
         # reconstructor.accelerator = accelerator
-        reconstructor.load_datasets(dataset_per_proc[i], True, False, args.start_from_scratch, args.start_from_file)
+        reconstructor.load_datasets(dataset_per_proc[i], True, False, args.start_from_scratch)
 
         if args.sharded:
             del reconstruct_args["model"]

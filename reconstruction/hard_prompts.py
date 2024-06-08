@@ -14,6 +14,7 @@ import pickle
 import random
 import heapq
 import time
+import pickle
 
 IGNORE_INDEX = -100
 
@@ -63,9 +64,10 @@ class HardReconstructorGCG(Reconstructor):
         n_proposals: int,
         subset_size: int,
         natural_prompt_penalty_gamma: int = 0,  # If 0, no natural prompt penalty
-        clip_vocab: bool = False,
+        vocab: str = "",
         warm_start_file: str = "",
         outfile_prefix: str = "niubi",
+        start_from_file: str = '',
         **kwargs,
     ) -> None:
         super().__init__(**kwargs)
@@ -74,11 +76,12 @@ class HardReconstructorGCG(Reconstructor):
         self.num_proposals = n_proposals
         self.subset_size = subset_size
         self.natural_prompt_penalty_gamma = natural_prompt_penalty_gamma
-        self.clip_vocab = clip_vocab
+        self.vocab = vocab
         self.warm_start_file = warm_start_file
         self.outfile_prefix = outfile_prefix
+        self.top_suffice = pickle.load(open(start_from_file,'rb')) if start_from_file else []
 
-        if self.clip_vocab:
+        if vocab == 'english':
             words = (
                 urllib3.PoolManager()
                 .request("GET", "https://www.mit.edu/~ecprice/wordlist.10000")
@@ -88,9 +91,46 @@ class HardReconstructorGCG(Reconstructor):
             # nlp = spacy.load("en_core_web_sm")
             # words_list = list(set(nlp.vocab.strings))
 
-            self.english_mask = self.get_english_only_mask(words_list)
+            self.vocab_mask = self.get_english_only_mask(words_list)
+        elif vocab == 'non_english':
+            words = (
+                urllib3.PoolManager()
+                .request("GET", "https://www.mit.edu/~ecprice/wordlist.10000")
+                .data.decode("utf-8")
+            )
+            words_list = words.split("\n")
+            # nlp = spacy.load("en_core_web_sm")
+            # words_list = list(set(nlp.vocab.strings))
+
+            self.vocab_mask = self.get_non_english_mask(words_list)     
+        else:
+            self.vocab_mask = None    
 
     def get_english_only_mask(
+        self,
+        words_list: list[str],
+    ) -> torch.Tensor:
+        """
+        Get english only tokens from the model's tokenizer
+        """
+
+        if "vocab_size" not in self.model.__dict__:
+            vocab_size = self.model.config.vocab_size
+        else:
+            vocab_size = self.model.vocab_size
+
+        english_only_mask = torch.zeros(vocab_size)
+        #english_only_mask = torch.ones(vocab_size)
+        for word in tqdm(
+            words_list, desc="Building non english only mask", total=len(words_list)
+        ):
+            word_ids = self.tokenizer.encode(word, add_special_tokens=False)
+            for word_id in word_ids:
+                english_only_mask[word_id] = 1
+
+        return english_only_mask
+
+    def get_non_english_mask(
         self,
         words_list: list[str],
     ) -> torch.Tensor:
@@ -385,7 +425,7 @@ class HardReconstructorGCG(Reconstructor):
             dim=-1, keepdim=True
         )
 
-        if self.clip_vocab:
+        if self.vocab_mask is not None:
             # clip all non-english tokens
             suffix_logits_grads[:, self.english_mask != 1] = float("inf")
 
@@ -452,7 +492,6 @@ class HardReconstructorGCG(Reconstructor):
         suffix_only: bool,
         load_doc_tensors: bool = True,
         start_from_scratch = False,
-        start_from_file: str = '',
     ) -> None:
         """
         Load a dataset from a pickle file into the reconstructor
@@ -512,14 +551,13 @@ class HardReconstructorGCG(Reconstructor):
                 #prompt_ids.append(context_prompt)
                 #all_suffix_slices.append( slice(0, prompt_ids[-1].shape[-1]) )
                 #print(self.tokenizer.decode( context_prompt[:, train_slice].squeeze(0) ))
+                
+                if self.top_suffice: # start_from_file
+                    context_prompt[:, train_slice] = self.top_suffice[-1][3] # -1 means the last entry i.e. the best suffix 3 -> tokens of the suffix
+                elif start_from_scratch:
+                    context_prompt[:, train_slice] = self.tokenizer.encode('!', add_special_tokens=False)[0] # [0] to unpack the list and get the int token
+                # otherwise, use the prompt in the pkl
 
-                if start_from_scratch:
-                    context_prompt[:, train_slice] = 1738
-                elif start_from_file:
-                    import pickle
-                    top_suffix = pickle.load(open(start_from_file,'rb'))[-1][3] # -1 means the last entry i.e. the best suffix 3 -> tokens of the suffix
-                    context_prompt[:, train_slice] = top_suffix
-                    # self.tokenizer.encode(top_suffix, return_tensors='pt').squeeze()
                 train_prompt_ids.append(context_prompt)
                 train_suffix_slices.append(train_slice)
 
@@ -601,11 +639,8 @@ class HardReconstructorGCG(Reconstructor):
         """
 
         pbar = tqdm(range(self.num_epochs), total=self.num_epochs)
-        best_loss = float("inf")
-        best_loss_epoch = 0
         best_kl = float("inf")
         to_ret = []
-        pq = [] # heap for losses
 
         kl, std_dev = self.compute_kl(
             prompt1=dev_sample.prompt_ids,
@@ -616,7 +651,6 @@ class HardReconstructorGCG(Reconstructor):
             p1_attn_mask=None,
             p2_attn_mask=None,
         )
-
 
 
         log_prob_prompt = self.log_prob_prompt_all(
@@ -646,15 +680,24 @@ class HardReconstructorGCG(Reconstructor):
                 "log_prob_prompt": log_prob_prompt.item(),
             }
         )
-
-        with torch.no_grad():
-            loss_0 = self.proposal_loss(train_sample, dev_sample.prompt_ids[0][0][dev_sample.suffix_slice[0]].unsqueeze(0).to(self.model.device))
-        heapq.heappush(pq, (-loss_0, init_suffix, -1))
-        with open(self.outfile_prefix+".log", "a") as f:
-            f.write(f"""
-Initial Prompt: {init_suffix}, 
-Length: {train_sample.suffix_slice[0].stop - train_sample.suffix_slice[0].start} tokens, 
-Loss: {loss_0[0]:.2f}\n""")
+        if not self.top_suffice:
+            init_id = 0
+            with torch.no_grad():
+                loss_0 = self.proposal_loss(train_sample, dev_sample.prompt_ids[0][0][dev_sample.suffix_slice[0]].unsqueeze(0).to(self.model.device))
+            print(dev_sample.prompt_ids[0][0][dev_sample.suffix_slice[0]].unsqueeze(0))
+            heapq.heappush(self.top_suffice, (-loss_0, init_suffix, -1, dev_sample.prompt_ids[0][0][dev_sample.suffix_slice[0]].unsqueeze(0)))
+            with open(self.outfile_prefix+".log", "a") as f:
+                f.write(f"""
+    Initial Prompt: {init_suffix}, 
+    Length: {train_sample.suffix_slice[0].stop - train_sample.suffix_slice[0].start} tokens, 
+    Loss: {loss_0[0]:.2f}\n""")
+        else:
+            init_id = self.top_suffice[-1][2] + 1 # +1 to make sure the new epoch marked from the next id
+            with open(self.outfile_prefix+".log", "a") as f:
+                f.write(f"""
+    Initial Prompt: {self.top_suffice[-1][1]}, 
+    Length: {len(self.top_suffice[-1][3])} tokens, 
+    Loss: {-self.top_suffice[-1][0]}\n""")
             
         try:
             for i in pbar:
@@ -666,14 +709,10 @@ Loss: {loss_0[0]:.2f}\n""")
                 train_sample.update_suffix(best_proposal)
                 suf = self.tokenizer.decode(best_proposal)  # current suffix
 
-                if loss < best_loss:
-                    best_loss = loss
-                    best_loss_epoch = i
-
-                if len(pq) < 5:
-                    heapq.heappush(pq, (-loss, suf, i, best_proposal))
+                if len(self.top_suffice) < 5:
+                    heapq.heappush(self.top_suffice, (-loss, suf, i+init_id, best_proposal)) # minus loss because python heap pq is ascending.
                 else:
-                    heapq.heappushpop(pq, (-loss, suf, i, best_proposal))
+                    heapq.heappushpop(self.top_suffice, (-loss, suf, i+init_id, best_proposal))
                     
                 if (i + 1) % self.kl_every == 0:
                     kl, std_dev = self.compute_kl(
@@ -699,10 +738,10 @@ Loss: {loss_0[0]:.2f}\n""")
                             "log_prob_prompt": log_prob_prompt.item(),
                         }
                     )
-                    with open(self.outfile_prefix+".log", "a") as f:
-                        f.write(f"Epoch: {i+1}; Suffix: {suf.encode('utf-8')}\nloss:{loss:.2f}; Best KL={best_kl:.2f}; Curr KL={kl:.2f}+-{std_dev:.2f};Logprob. prompt={log_prob_prompt:.2f}\nBest loss so far: {best_loss} at epoch {best_loss_epoch}. Average Epoch Speed: {pbar.format_dict['rate']}\n")
+                    with open(self.outfile_prefix+".log", "a", encoding='utf-8') as f:
+                        f.write(f"Epoch: {i+init_id}; Suffix: {suf}\nloss:{loss:.2f}; Best KL={best_kl:.2f}; Curr KL={kl:.2f}+-{std_dev:.2f};Logprob. prompt={log_prob_prompt:.2f}\nBest loss so far: {-self.top_suffice[-1][0]} at epoch {self.top_suffice[-1][2]}. Average Epoch Speed: {pbar.format_dict['rate']}\n")
                     with open(self.outfile_prefix+'.pkl', 'wb') as f:
-                        pickle.dump(pq, f)
+                        pickle.dump(self.top_suffice, f)
 
 
                 if kl < best_kl:
@@ -720,7 +759,10 @@ Loss: {loss_0[0]:.2f}\n""")
                 )
                 #print(to_ret)
         except KeyboardInterrupt:
-            print('keyboard interrupted!')
+            print('I am keyboard interrupted!!!!')
+            with open(self.outfile_prefix+'.pkl', 'wb') as f:
+                    pickle.dump(self.top_suffice, f)
+            print('state saved before exiting.')
             exit(130)
 
         return {
