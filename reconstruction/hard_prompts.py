@@ -427,7 +427,7 @@ class HardReconstructorGCG(Reconstructor):
 
         if self.vocab_mask is not None:
             # clip all non-english tokens
-            suffix_logits_grads[:, self.english_mask != 1] = float("inf")
+            suffix_logits_grads[:, self.vocab_mask != 1] = float("inf")
 
         # Select the top-k logits for each suffix pos based on -grad of the logits
         top_k_suffix_logits_grads, top_k_suffix_indices = torch.topk(
