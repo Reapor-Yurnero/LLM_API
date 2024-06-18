@@ -304,7 +304,7 @@ def build_context_prompt(
             Tuple of the prompt ids and the slice of the actual prompt (suffix)
     """
 
-    model_name = MODEL_NAME_OR_PATH_TO_NAME[model_name]
+    # model_name = MODEL_NAME_OR_PATH_TO_NAME[model_name]
 
     if isinstance(context, List):
         return prompt_template_handler(model_name, context, prompt, tokenizer)

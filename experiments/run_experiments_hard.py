@@ -86,7 +86,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("--init_prompt_char", type=str, default="!")
     parser.add_argument("--clip_vocab", action="store_true") #deprecated now!
-    parser.add_argument("--vocab", type=str, default="non_english", choices = ["english", "non_english", "all_allow"])
+    parser.add_argument("--vocab", type=str, default="non_english", choices = ["english", "non_english", "all_allow", "hybrid"])
     parser.add_argument(
         "--warm_start_file",
         type=str,

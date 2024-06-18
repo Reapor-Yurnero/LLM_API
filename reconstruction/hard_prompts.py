@@ -81,7 +81,8 @@ class HardReconstructorGCG(Reconstructor):
         self.outfile_prefix = outfile_prefix
         self.top_suffice = pickle.load(open(start_from_file,'rb')) if start_from_file else []
 
-        if vocab == 'english':
+        self.vocab_mask = None 
+        if self.vocab == 'english':
             words = (
                 urllib3.PoolManager()
                 .request("GET", "https://www.mit.edu/~ecprice/wordlist.10000")
@@ -90,9 +91,8 @@ class HardReconstructorGCG(Reconstructor):
             words_list = words.split("\n")
             # nlp = spacy.load("en_core_web_sm")
             # words_list = list(set(nlp.vocab.strings))
-
             self.vocab_mask = self.get_english_only_mask(words_list)
-        elif vocab == 'non_english':
+        elif self.vocab == 'non_english':
             words = (
                 urllib3.PoolManager()
                 .request("GET", "https://www.mit.edu/~ecprice/wordlist.10000")
@@ -101,10 +101,17 @@ class HardReconstructorGCG(Reconstructor):
             words_list = words.split("\n")
             # nlp = spacy.load("en_core_web_sm")
             # words_list = list(set(nlp.vocab.strings))
-
-            self.vocab_mask = self.get_non_english_mask(words_list)     
-        else:
-            self.vocab_mask = None    
+            self.vocab_mask = self.get_non_english_mask(words_list)
+        elif self.vocab == 'hybrid':
+            words = (
+                urllib3.PoolManager()
+                .request("GET", "https://www.mit.edu/~ecprice/wordlist.10000")
+                .data.decode("utf-8")
+            )
+            words_list = words.split("\n")
+            self.english_mask = self.get_english_only_mask(words_list)
+            self.non_english_mask = self.get_non_english_mask(words_list)         
+               
 
     def get_english_only_mask(
         self,
@@ -425,18 +432,51 @@ class HardReconstructorGCG(Reconstructor):
             dim=-1, keepdim=True
         )
 
-        if self.vocab_mask is not None:
+        if self.vocab in ['english', 'non_english']:
             # clip all non-english tokens
             suffix_logits_grads[:, self.vocab_mask != 1] = float("inf")
 
-        # Select the top-k logits for each suffix pos based on -grad of the logits
-        top_k_suffix_logits_grads, top_k_suffix_indices = torch.topk(
-            -suffix_logits_grads,
-            k=self.k,
-            dim=-1,
-        )
+            # Select the top-k logits for each suffix pos based on -grad of the logits
+            top_k_suffix_logits_grads, top_k_suffix_indices = torch.topk(
+                -suffix_logits_grads,
+                k=self.k,
+                dim=-1,
+            )
+        elif self.vocab == 'all_allow':
+            top_k_suffix_logits_grads, top_k_suffix_indices = torch.topk(
+                -suffix_logits_grads,
+                k=self.k,
+                dim=-1,
+            )
+        elif self.vocab == 'hybrid':
+            suffix_logits_grads_tmp = suffix_logits_grads.detach().clone()
+            suffix_logits_grads_tmp[:, self.english_mask != 1] = float("inf")
 
-        #self.num_proposals = min(self.num_proposals, top_k_suffix_indices.shape[0])
+            # Select the top-k logits for each suffix pos based on -grad of the logits
+            top_k_english_suffix_logits_grads, top_k_english_suffix_indices = torch.topk(
+                -suffix_logits_grads_tmp,
+                k=self.k // 2,
+                dim=-1,
+            )
+
+            suffix_logits_grads_tmp = suffix_logits_grads.detach().clone()
+            suffix_logits_grads_tmp[:, self.non_english_mask != 1] = float("inf")
+
+            # Select the top-k logits for each suffix pos based on -grad of the logits
+            top_k_non_english_suffix_logits_grads, top_k_non_english_suffix_indices = torch.topk(
+                -suffix_logits_grads_tmp,
+                k=self.k // 2,
+                dim=-1,
+            )
+            #print(self.k)
+            #print(top_k_english_suffix_logits_grads.size())
+            #print(top_k_non_english_suffix_logits_grads.size())
+            #print(top_k_english_suffix_indices.size())
+            #print(top_k_non_english_suffix_indices.size())
+            top_k_suffix_logits_grads = torch.cat([top_k_english_suffix_logits_grads, top_k_non_english_suffix_logits_grads], dim = 1)
+            top_k_suffix_indices = torch.cat([top_k_english_suffix_indices, top_k_non_english_suffix_indices], dim = 1)
+
+
         self.total_proposals = self.num_proposals * top_k_suffix_indices.shape[0]
         #print(self.num_proposals)
         #print(top_k_suffix_indices.size())
