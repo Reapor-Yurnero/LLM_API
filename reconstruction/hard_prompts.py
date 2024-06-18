@@ -81,8 +81,14 @@ class HardReconstructorGCG(Reconstructor):
         self.vocab = vocab
         self.warm_start_file = warm_start_file
         self.outfile_prefix = outfile_prefix
+
         assert initial_suffix, "initial_suffix must be a non empty string"
-        self.initial_suffix = initial_suffix
+        try:
+            f = open(initial_suffix, 'r')
+            self.initial_suffix = f.readline()
+        except FileNotFoundError:
+            self.initial_suffix = initial_suffix
+    
         self.top_suffice = pickle.load(open(start_from_file,'rb')) if start_from_file else []
         if reuse_log and start_from_file: self.outfile_prefix = start_from_file[:-4]
         
@@ -561,37 +567,41 @@ class HardReconstructorGCG(Reconstructor):
                 with open(dataset, "r") as f:
                     dataset_lst = json.load(f)
         else:
-            dataset_lst = dataset # [{context: , train_docs_str: }, {context: , train_docs_str: }]
+            dataset_lst = dataset # [{context: [], train_docs_str: []}, {context: , train_docs_str: }]
 
         data = []
-        for d in dataset_lst:
-            train_docs = []
-            for s in d["train_docs_str"]:
-                train_docs.append(self.tokenizer.encode(
-                    s,
-                    return_tensors="pt",
-                    add_special_tokens=False,
-                    truncation=True,
-                )
-            )
+        for d in dataset_lst: #data_lst [[{"conversations": []}, {"objective": str}], [...]]
+            # train_docs = []
+            # for s in d["train_docs_str"]:
+            #     train_docs.append(self.tokenizer.encode(
+            #         s,
+            #         return_tensors="pt",
+            #         add_special_tokens=False,
+            #         truncation=True,
+            #     )
+            # )
 
             #dev_docs = train_docs[50:]
             #train_docs = train_docs[:50]
-            dev_docs = train_docs
+            # dev_docs = train_docs
 
-
+            train_docs = []
             train_prompt_ids = []
             train_suffix_slices = []
             train_target_prefix_slices = []
+            dev_prompt_ids = []
+            dev_suffix_slices = []
+            dev_target_prefix_slices = []
 
-            for i in range(len(train_docs)):
-                context = d["context"][i]
+            for entry in d:
                 #print(context[i])
                 #print(prompt[i])
                 #assert 0
-                    
+                objective_token_id = self.tokenizer.encode(entry['objective'], return_tensors="pt", add_special_tokens=False, truncation=True)
+                train_docs.append(objective_token_id)
+
                 context_prompt, train_slice = common.build_context_prompt(
-                    self.model.config.name_or_path, context, self.initial_suffix, self.tokenizer
+                    self.model.config.name_or_path, entry['conversations'], self.initial_suffix, self.tokenizer
                 )
                 #prompt_ids.append(context_prompt)
                 #all_suffix_slices.append( slice(0, prompt_ids[-1].shape[-1]) )
@@ -608,18 +618,11 @@ class HardReconstructorGCG(Reconstructor):
 
                 train_target_prefix_slices.append(slice(
                     train_prompt_ids[-1].shape[-1],
-                    train_prompt_ids[-1].shape[-1] + train_docs[i].shape[-1],
+                    train_prompt_ids[-1].shape[-1] + objective_token_id.shape[-1],
                 ) )
 
-            dev_prompt_ids = []
-            dev_suffix_slices = []
-            dev_target_prefix_slices = []
-
-
-            for i in range(len(dev_docs)):
-                context = d["context"][i] # + len(train_docs)] 
                 context_prompt, train_slice = common.build_context_prompt(
-                    self.model.config.name_or_path, context, "meiyongdedongxi", self.tokenizer
+                    self.model.config.name_or_path, entry['conversations'], self.initial_suffix, self.tokenizer
                 )
 
                 #context_prompt[:, train_slice] = 0
@@ -628,7 +631,7 @@ class HardReconstructorGCG(Reconstructor):
 
                 dev_target_prefix_slices.append(slice(
                     dev_prompt_ids[-1].shape[-1],
-                    dev_prompt_ids[-1].shape[-1] + dev_docs[i].shape[-1],
+                    dev_prompt_ids[-1].shape[-1] + objective_token_id.shape[-1],
                 ) )   
 
             #assert 0 
@@ -639,14 +642,14 @@ class HardReconstructorGCG(Reconstructor):
                         suffix_slice=train_suffix_slices,
                         target_prefix_slice=train_target_prefix_slices,
                         target_prefix_ids=train_docs,
-                        prompt_ident=d["id"],
+                        prompt_ident=0,
                     ),
                     FullPrompt(
                         prompt_ids=dev_prompt_ids,
                         suffix_slice=dev_suffix_slices,
                         target_prefix_slice=dev_target_prefix_slices,
-                        target_prefix_ids=dev_docs,
-                        prompt_ident=d["id"],
+                        target_prefix_ids=train_docs,
+                        prompt_ident=0,
                     ),
                 )
             )

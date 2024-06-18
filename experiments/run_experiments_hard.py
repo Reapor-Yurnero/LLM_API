@@ -123,8 +123,8 @@ if __name__ == "__main__":
     # )
 
     Path(args.output_dir).mkdir(parents=True, exist_ok=True)
-    dataset = pickle.load(open(args.dataset_path, "rb"))
-    dataset_per_proc = common.split_for_multiproc(dataset, n_procs)
+    dataset = json.load(open(args.dataset_path, "r"))
+    # dataset_per_proc = common.split_for_multiproc(dataset, n_procs)
 
     from datetime import datetime
     now = datetime.now()
@@ -159,7 +159,7 @@ if __name__ == "__main__":
             **reconstruct_args,
         )
         # reconstructor.accelerator = accelerator
-        reconstructor.load_datasets(dataset_per_proc[i], True, False)
+        reconstructor.load_datasets([dataset], True, False)
 
         if args.sharded:
             del reconstruct_args["model"]
