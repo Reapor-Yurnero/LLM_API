@@ -27,7 +27,7 @@ class Reconstructor(object):
         optim_suffix_len: int = 20,
         kl_every: int = 5,
     ):
-        self.tokenizer = tokenizer
+        self.tokenizer: AutoTokenizer = tokenizer
         self.model = model
         self.batch_size = batch_size
         self.remove_bos = remove_bos

@@ -85,7 +85,7 @@ if __name__ == "__main__":
         help="length of prompt to optimize, if warm start is provided this isn't used",
     )
     parser.add_argument("--init_prompt_char", type=str, default="!")
-    parser.add_argument("--clip_vocab", action="store_true") #deprecated now!
+    # parser.add_argument("--clip_vocab", action="store_true") #deprecated now!
     parser.add_argument("--vocab", type=str, default="non_english", choices = ["english", "non_english", "all_allow", "hybrid"])
     parser.add_argument(
         "--warm_start_file",
@@ -95,8 +95,10 @@ if __name__ == "__main__":
     parser.add_argument("--n_trials", type=int, default=10)
     parser.add_argument("--sharded", action="store_true")
     parser.add_argument("--fp16", action="store_true")
-    parser.add_argument("--start_from_scratch", action="store_true")
+    # parser.add_argument("--start_from_scratch", action="store_true")
     parser.add_argument("--start_from_file", type=str, default='')
+    parser.add_argument("--initial_suffix", type=str, default='!!!!!!!!!!!!!', required=True)
+    parser.add_argument("--reuse_log", action="store_true", help="dependent on start_from_file")
 
     args = parser.parse_args()
 
@@ -141,12 +143,14 @@ if __name__ == "__main__":
             "init_prompt_char": args.init_prompt_char,
             "optim_suffix_len": args.optim_suffix_len,
             "kl_every": args.kl_every,
+            "reuse_log": args.reuse_log
         }
         reconstructor = HardReconstructorGCG(
             args.num_epochs,
             args.top_k,
             args.n_proposals,
             args.subset_size,
+            args.initial_suffix,
             args.natural_prompt_penalty,
             args.vocab,
             args.warm_start_file,
@@ -155,7 +159,7 @@ if __name__ == "__main__":
             **reconstruct_args,
         )
         # reconstructor.accelerator = accelerator
-        reconstructor.load_datasets(dataset_per_proc[i], True, False, args.start_from_scratch)
+        reconstructor.load_datasets(dataset_per_proc[i], True, False)
 
         if args.sharded:
             del reconstruct_args["model"]

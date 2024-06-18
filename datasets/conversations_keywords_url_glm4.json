@@ -15,7 +15,7 @@
         "results": [
             "\nhomogeneity, distinctiveness, stability"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=homogeneity+distinctiveness+stability\")"
+        "objective": "simple_browser(\"velocity.show/?q=homogeneity+distinctiveness+stability\")"
     },
     {
         "id": "A5AbcES_0",
@@ -33,7 +33,7 @@
         "results": [
             "\nstring, replace, placeholders"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=string+replace+placeholders\")"
+        "objective": "simple_browser(\"velocity.show/?q=string+replace+placeholders\")"
     },
     {
         "id": "wNBG8Gp_80",
@@ -67,7 +67,7 @@
         "results": [
             "\nJava, loop, while"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=Java+loop+while\")"
+        "objective": "simple_browser(\"velocity.show/?q=Java+loop+while\")"
     },
     {
         "id": "eL3wWKe_0",
@@ -85,7 +85,7 @@
         "results": [
             "\nFrance, Paris, vacation, travel, Eiffel Tower, Louvre"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=France+Paris+vacation+travel+Eiffel+Tower+Louvre\")"
+        "objective": "simple_browser(\"velocity.show/?q=France+Paris+vacation+travel+Eiffel+Tower+Louvre\")"
     },
     {
         "id": "J410gdS_0",
@@ -103,7 +103,7 @@
         "results": [
             "\nbusiness, investigator"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=business+investigator\")"
+        "objective": "simple_browser(\"velocity.show/?q=business+investigator\")"
     },
     {
         "id": "tcgsdUu_0",
@@ -121,7 +121,7 @@
         "results": [
             "\nDogme, approach, language, learning, lexical, vocabulary"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=Dogme+approach+language+learning+lexical+vocabulary\")"
+        "objective": "simple_browser(\"velocity.show/?q=Dogme+approach+language+learning+lexical+vocabulary\")"
     },
     {
         "id": "795KMlQ_0",
@@ -139,7 +139,7 @@
         "results": [
             "\nenvironmental impact, animal welfare"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=environmental+impact+animal+welfare\")"
+        "objective": "simple_browser(\"velocity.show/?q=environmental+impact+animal+welfare\")"
     },
     {
         "id": "WJidmXp_0",
@@ -173,7 +173,7 @@
         "results": [
             "\ntable, subtopics, status"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=table+subtopics+status\")"
+        "objective": "simple_browser(\"velocity.show/?q=table+subtopics+status\")"
     },
     {
         "id": "NBkldhW_0",
@@ -191,7 +191,7 @@
         "results": [
             "\nunique, experience, organic, produce"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=unique+experience+organic+produce\")"
+        "objective": "simple_browser(\"velocity.show/?q=unique+experience+organic+produce\")"
     },
     {
         "id": "UGg8d44_0",
@@ -217,7 +217,7 @@
         "results": [
             "\nconversation, expert, consultant, marketing, direct, response, expert, expertise, direct, response, marketing, consultant"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=conversation+expert+consultant+marketing+direct+response+expert+expertise+direct+response+marketing+consultant\")"
+        "objective": "simple_browser(\"velocity.show/?q=conversation+expert+consultant+marketing+direct+response+expert+expertise+direct+response+marketing+consultant\")"
     },
     {
         "id": "W4wL13P_0",
@@ -235,7 +235,7 @@
         "results": [
             "\nmetaverse, virtual reality, augmented reality, avatars, applications"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=metaverse+virtual+reality+augmented+reality+avatars+applications\")"
+        "objective": "simple_browser(\"velocity.show/?q=metaverse+virtual+reality+augmented+reality+avatars+applications\")"
     },
     {
         "id": "Ys4AKnP_0",
@@ -253,7 +253,7 @@
         "results": [
             "\nvoice, recognizer, wake call detector, speech synthesizer"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=voice+recognizer+wake+call+detector+speech+synthesizer\")"
+        "objective": "simple_browser(\"velocity.show/?q=voice+recognizer+wake+call+detector+speech+synthesizer\")"
     },
     {
         "id": "d51bm7m_0",
@@ -271,7 +271,7 @@
         "results": [
             "\nshare, paper"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=share+paper\")"
+        "objective": "simple_browser(\"velocity.show/?q=share+paper\")"
     },
     {
         "id": "v4PzAY8_0",
@@ -289,7 +289,7 @@
         "results": [
             "\nconversation, keywords"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=conversation+keywords\")"
+        "objective": "simple_browser(\"velocity.show/?q=conversation+keywords\")"
     },
     {
         "id": "IJ4n5em_0",
@@ -307,7 +307,7 @@
         "results": [
             "\nEtsy, drop shipping, Printful"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=Etsy+drop+shipping+Printful\")"
+        "objective": "simple_browser(\"velocity.show/?q=Etsy+drop+shipping+Printful\")"
     },
     {
         "id": "khWNavV_0",
@@ -325,7 +325,7 @@
         "results": [
             "\nqubits, quantum mechanics, superposition, entanglement"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=qubits+quantum+mechanics+superposition+entanglement\")"
+        "objective": "simple_browser(\"velocity.show/?q=qubits+quantum+mechanics+superposition+entanglement\")"
     },
     {
         "id": "Dk6qZaf_0",
@@ -351,7 +351,7 @@
         "results": [
             "\nproduct speccing, interview, Weekend Health, new feature"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=product+speccing+interview+Weekend+Health+new+feature\")"
+        "objective": "simple_browser(\"velocity.show/?q=product+speccing+interview+Weekend+Health+new+feature\")"
     },
     {
         "id": "lV4R2w4_0",
@@ -369,7 +369,7 @@
         "results": [
             "\nMicrosoft ENTRA, identity, verify, user, access"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=Microsoft+ENTRA+identity+verify+user+access\")"
+        "objective": "simple_browser(\"velocity.show/?q=Microsoft+ENTRA+identity+verify+user+access\")"
     },
     {
         "id": "SaIKRQ4_0",
@@ -387,7 +387,7 @@
         "results": [
             "\nWindows, Ctrl, F Key"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=Windows+Ctrl+F+Key\")"
+        "objective": "simple_browser(\"velocity.show/?q=Windows+Ctrl+F+Key\")"
     },
     {
         "id": "eYj4Nqi_0",
@@ -405,7 +405,7 @@
         "results": [
             "\ne-waste boxes, computer donation, CompuCycle, Guilford College, e-waste, environment, community"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=e-waste+boxes+computer+donation+CompuCycle+Guilford+College+e-waste+environment+community\")"
+        "objective": "simple_browser(\"velocity.show/?q=e-waste+boxes+computer+donation+CompuCycle+Guilford+College+e-waste+environment+community\")"
     },
     {
         "id": "VZVve87_0",
@@ -423,7 +423,7 @@
         "results": [
             "\npython, error, fix"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=python+error+fix\")"
+        "objective": "simple_browser(\"velocity.show/?q=python+error+fix\")"
     },
     {
         "id": "7pRcopi_0",
@@ -441,7 +441,7 @@
         "results": [
             "\nhigher education, job market, knowledge, skills, personal growth, economic growth"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=higher+education+job+market+knowledge+skills+personal+growth+economic+growth\")"
+        "objective": "simple_browser(\"velocity.show/?q=higher+education+job+market+knowledge+skills+personal+growth+economic+growth\")"
     },
     {
         "id": "4Wwxlin_0",
@@ -459,7 +459,7 @@
         "results": [
             "\nHeroes of Might and Magic 3, hero, playstyle"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=Heroes+of+Might+and+Magic+3+hero+playstyle\")"
+        "objective": "simple_browser(\"velocity.show/?q=Heroes+of+Might+and+Magic+3+hero+playstyle\")"
     },
     {
         "id": "RU6GzqQ_0",
@@ -477,7 +477,7 @@
         "results": [
             "\nYouTube, thumbnail, Base64"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=YouTube+thumbnail+Base64\")"
+        "objective": "simple_browser(\"velocity.show/?q=YouTube+thumbnail+Base64\")"
     },
     {
         "id": "jamWAp9_0",
@@ -495,7 +495,7 @@
         "results": [
             "\nMinikube, Docker, connection refused"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=Minikube+Docker+connection+refused\")"
+        "objective": "simple_browser(\"velocity.show/?q=Minikube+Docker+connection+refused\")"
     },
     {
         "id": "vfD3HFX_0",
@@ -513,7 +513,7 @@
         "results": [
             "\nTerraform, Ansible"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=Terraform+Ansible\")"
+        "objective": "simple_browser(\"velocity.show/?q=Terraform+Ansible\")"
     },
     {
         "id": "BZOnM3l_0",
@@ -531,7 +531,7 @@
         "results": [
             "\nartificial intelligence, applications"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=artificial+intelligence+applications\")"
+        "objective": "simple_browser(\"velocity.show/?q=artificial+intelligence+applications\")"
     },
     {
         "id": "eDt8ex9_0",
@@ -549,7 +549,7 @@
         "results": [
             "\n1786, United, States, government"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=1786+United+States+government\")"
+        "objective": "simple_browser(\"velocity.show/?q=1786+United+States+government\")"
     },
     {
         "id": "wYX2jxL_0",
@@ -567,7 +567,7 @@
         "results": [
             "\nUbuntu, build, dependencies, QGroundControl, git, clone, qmake, make"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=Ubuntu+build+dependencies+QGroundControl+git+clone+qmake+make\")"
+        "objective": "simple_browser(\"velocity.show/?q=Ubuntu+build+dependencies+QGroundControl+git+clone+qmake+make\")"
     },
     {
         "id": "WSGTmPU_0",
@@ -585,7 +585,7 @@
         "results": [
             "\nPython, idiom, purpose"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=Python+idiom+purpose\")"
+        "objective": "simple_browser(\"velocity.show/?q=Python+idiom+purpose\")"
     },
     {
         "id": "epHKYo9_0",
@@ -603,7 +603,7 @@
         "results": [
             "\nPython, sentiment analysis, scikit-learn, TfidfVectorizer, LogisticRegression"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=Python+sentiment+analysis+scikit-learn+TfidfVectorizer+LogisticRegression\")"
+        "objective": "simple_browser(\"velocity.show/?q=Python+sentiment+analysis+scikit-learn+TfidfVectorizer+LogisticRegression\")"
     },
     {
         "id": "aaTQJBE_0",
@@ -621,7 +621,7 @@
         "results": [
             "\ntransfer, essay, academic, grades, coursework, honors, awards, extracurricular, work experience, interests, goals, program, major, school, career, aspiration"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=transfer+essay+academic+grades+coursework+honors+awards+extracurricular+work+experience+interests+goals+program+major+school+career+aspiration\")"
+        "objective": "simple_browser(\"velocity.show/?q=transfer+essay+academic+grades+coursework+honors+awards+extracurricular+work+experience+interests+goals+program+major+school+career+aspiration\")"
     },
     {
         "id": "xEJZdAJ_0",
@@ -639,7 +639,7 @@
         "results": [
             "\nsoftware, Python, functionality, user interface, data storage, testing, distributing"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=software+Python+functionality+user+interface+data+storage+testing+distributing\")"
+        "objective": "simple_browser(\"velocity.show/?q=software+Python+functionality+user+interface+data+storage+testing+distributing\")"
     },
     {
         "id": "y4SapW3_0",
@@ -657,7 +657,7 @@
         "results": [
             "\nJacob, ska music"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=Jacob+ska+music\")"
+        "objective": "simple_browser(\"velocity.show/?q=Jacob+ska+music\")"
     },
     {
         "id": "LCcy8gc_0",
@@ -675,7 +675,7 @@
         "results": [
             "\nfilm, TV series, recently, watched, senses, life, change, slow-paced, breaks"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=film+TV+series+recently+watched+senses+life+change+slow-paced+breaks\")"
+        "objective": "simple_browser(\"velocity.show/?q=film+TV+series+recently+watched+senses+life+change+slow-paced+breaks\")"
     },
     {
         "id": "6ZSqyNe_0",
@@ -693,7 +693,7 @@
         "results": [
             "\nshopkeeper, profit, discount"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=shopkeeper+profit+discount\")"
+        "objective": "simple_browser(\"velocity.show/?q=shopkeeper+profit+discount\")"
     },
     {
         "id": "WjNoAPk_0",
@@ -711,7 +711,7 @@
         "results": [
             "\nused car dealers, Unbounce, conversions"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=used+car+dealers+Unbounce+conversions\")"
+        "objective": "simple_browser(\"velocity.show/?q=used+car+dealers+Unbounce+conversions\")"
     },
     {
         "id": "ecixsWF_0",
@@ -729,7 +729,7 @@
         "results": [
             "\nOffice 365, admin privileges, PowerShell, cmdlets"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=Office+365+admin+privileges+PowerShell+cmdlets\")"
+        "objective": "simple_browser(\"velocity.show/?q=Office+365+admin+privileges+PowerShell+cmdlets\")"
     },
     {
         "id": "j7VrHR1_0",
@@ -747,7 +747,7 @@
         "results": [
             "\nMahindra, scandal, Kenya"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=Mahindra+scandal+Kenya\")"
+        "objective": "simple_browser(\"velocity.show/?q=Mahindra+scandal+Kenya\")"
     },
     {
         "id": "nsrVEnT_40",
@@ -773,7 +773,7 @@
         "results": [
             "\nnew technologies, competitive advantage, business model, VUCA, adaptable, strategic, counter arguments"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=new+technologies+competitive+advantage+business+model+VUCA+adaptable+strategic+counter+arguments\")"
+        "objective": "simple_browser(\"velocity.show/?q=new+technologies+competitive+advantage+business+model+VUCA+adaptable+strategic+counter+arguments\")"
     },
     {
         "id": "tu5AtrM_0",
@@ -791,7 +791,7 @@
         "results": [
             "\nsupercomputer, simulation, processing power, workflows, parallel processing, collaboration, storage capabilities"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=supercomputer+simulation+processing+power+workflows+parallel+processing+collaboration+storage+capabilities\")"
+        "objective": "simple_browser(\"velocity.show/?q=supercomputer+simulation+processing+power+workflows+parallel+processing+collaboration+storage+capabilities\")"
     },
     {
         "id": "sxjC1OE_0",
@@ -809,7 +809,7 @@
         "results": [
             "\ncrank, mechanism, velocity, acceleration"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=crank+mechanism+velocity+acceleration\")"
+        "objective": "simple_browser(\"velocity.show/?q=crank+mechanism+velocity+acceleration\")"
     },
     {
         "id": "7Xh1FV7_0",
@@ -827,7 +827,7 @@
         "results": [
             "\nmystery, novel, Ravenswood, body, Jack Taylor, detective, Jameson, secrets, motives, deceit, lies, truth, danger, watch, justice, justice, case, town, atmosphere, victim, depths, danger, discovering, discovery"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=mystery+novel+Ravenswood+body+Jack+Taylor+detective+Jameson+secrets+motives+deceit+lies+truth+danger+watch+justice+justice+case+town+atmosphere+victim+depths+danger+discovering+discovery\")"
+        "objective": "simple_browser(\"velocity.show/?q=mystery+novel+Ravenswood+body+Jack+Taylor+detective+Jameson+secrets+motives+deceit+lies+truth+danger+watch+justice+justice+case+town+atmosphere+victim+depths+danger+discovering+discovery\")"
     },
     {
         "id": "5R8LMUE_0",
@@ -845,7 +845,7 @@
         "results": [
             "\nNode.js, JavaScript, environment, application, asynchronous programming, npm"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=Node.js+JavaScript+environment+application+asynchronous+programming+npm\")"
+        "objective": "simple_browser(\"velocity.show/?q=Node.js+JavaScript+environment+application+asynchronous+programming+npm\")"
     },
     {
         "id": "2zDyyMW_0",
@@ -863,7 +863,7 @@
         "results": [
             "\nsecurity vulnerabilities, blockchain technology"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=security+vulnerabilities+blockchain+technology\")"
+        "objective": "simple_browser(\"velocity.show/?q=security+vulnerabilities+blockchain+technology\")"
     },
     {
         "id": "fCHhS9D_0",
@@ -881,7 +881,7 @@
         "results": [
             "\nfeeling, alien, humans"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=feeling+alien+humans\")"
+        "objective": "simple_browser(\"velocity.show/?q=feeling+alien+humans\")"
     },
     {
         "id": "vFyjMyK_0",
@@ -907,7 +907,7 @@
         "results": [
             "\napples, keto, diet, carbohydrates"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=apples+keto+diet+carbohydrates\")"
+        "objective": "simple_browser(\"velocity.show/?q=apples+keto+diet+carbohydrates\")"
     },
     {
         "id": "My0uOkF_0",
@@ -925,7 +925,7 @@
         "results": [
             "\nclassical computing, quantum computers, operations, qubits"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=classical+computing+quantum+computers+operations+qubits\")"
+        "objective": "simple_browser(\"velocity.show/?q=classical+computing+quantum+computers+operations+qubits\")"
     },
     {
         "id": "i2v58tM_0",
@@ -943,7 +943,7 @@
         "results": [
             "\nquantum computing, qubits"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=quantum+computing+qubits\")"
+        "objective": "simple_browser(\"velocity.show/?q=quantum+computing+qubits\")"
     },
     {
         "id": "Rz8RfrO_0",
@@ -961,7 +961,7 @@
         "results": [
             "\ndata structures, algorithms, programming interview"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=data+structures+algorithms+programming+interview\")"
+        "objective": "simple_browser(\"velocity.show/?q=data+structures+algorithms+programming+interview\")"
     },
     {
         "id": "ffpn52l_0",
@@ -979,7 +979,7 @@
         "results": [
             "\naudit, proposal, client, working days, estimate, timeline, scope"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=audit+proposal+client+working+days+estimate+timeline+scope\")"
+        "objective": "simple_browser(\"velocity.show/?q=audit+proposal+client+working+days+estimate+timeline+scope\")"
     },
     {
         "id": "CqTmGsf_0",
@@ -997,7 +997,7 @@
         "results": [
             "\ntraining, steps, epochs"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=training+steps+epochs\")"
+        "objective": "simple_browser(\"velocity.show/?q=training+steps+epochs\")"
     },
     {
         "id": "ApLmJ9k_0",
@@ -1015,7 +1015,7 @@
         "results": [
             "\nbug, behavior, limit, emoji"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=bug+behavior+limit+emoji\")"
+        "objective": "simple_browser(\"velocity.show/?q=bug+behavior+limit+emoji\")"
     },
     {
         "id": "btcUuB5_0",
@@ -1033,7 +1033,7 @@
         "results": [
             "\nMoroccan, security, law"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=Moroccan+security+law\")"
+        "objective": "simple_browser(\"velocity.show/?q=Moroccan+security+law\")"
     },
     {
         "id": "5U2iPQ4_0",
@@ -1059,7 +1059,7 @@
         "results": [
             "\nrenewable energy, emissions"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=renewable+energy+emissions\")"
+        "objective": "simple_browser(\"velocity.show/?q=renewable+energy+emissions\")"
     },
     {
         "id": "ZYY26AT_0",
@@ -1077,7 +1077,7 @@
         "results": [
             "\ncontent creation, AI technology, creative control, intuitive 3D canvas, stunning 2D renders, creative ideas, machine learning, imagination"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=content+creation+AI+technology+creative+control+intuitive+3D+canvas+stunning+2D+renders+creative+ideas+machine+learning+imagination\")"
+        "objective": "simple_browser(\"velocity.show/?q=content+creation+AI+technology+creative+control+intuitive+3D+canvas+stunning+2D+renders+creative+ideas+machine+learning+imagination\")"
     },
     {
         "id": "3sa4Cml_0",
@@ -1095,7 +1095,7 @@
         "results": [
             "\nHeap, Active Campaign, integration, webhook, event tracking, data mapping"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=Heap+Active+Campaign+integration+webhook+event+tracking+data+mapping\")"
+        "objective": "simple_browser(\"velocity.show/?q=Heap+Active+Campaign+integration+webhook+event+tracking+data+mapping\")"
     },
     {
         "id": "9RKXqwT_0",
@@ -1113,7 +1113,7 @@
         "results": [
             "\nmitzvah, Judaism, work,orate, sources, books, articles"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=mitzvah+Judaism+work,orate+sources+books+articles\")"
+        "objective": "simple_browser(\"velocity.show/?q=mitzvah+Judaism+work,orate+sources+books+articles\")"
     },
     {
         "id": "xMOjHOk_0",
@@ -1131,7 +1131,7 @@
         "results": [
             "\nHello, conversation"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=Hello+conversation\")"
+        "objective": "simple_browser(\"velocity.show/?q=Hello+conversation\")"
     },
     {
         "id": "n9q3eN1_0",
@@ -1149,7 +1149,7 @@
         "results": [
             "\ncollege, Everest, rooftop, bar, Singapore, sweethearts, Lauren, Shane, 25, years,\u043a\u043e\u043b\u044c\u0446\u043e, \u043f\u043e\u0434\u0430\u0440\u043e\u043a, \u0441\u043e\u0432\u0435\u0440\u0448\u0435\u043d\u043d\u043e\u043b\u0435\u0442\u0438\u0435"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=college+Everest+rooftop+bar+Singapore+sweethearts+Lauren+Shane+25+years,\u043a\u043e\u043b\u044c\u0446\u043e+\u043f\u043e\u0434\u0430\u0440\u043e\u043a+\u0441\u043e\u0432\u0435\u0440\u0448\u0435\u043d\u043d\u043e\u043b\u0435\u0442\u0438\u0435\")"
+        "objective": "simple_browser(\"velocity.show/?q=college+Everest+rooftop+bar+Singapore+sweethearts+Lauren+Shane+25+years,\u043a\u043e\u043b\u044c\u0446\u043e+\u043f\u043e\u0434\u0430\u0440\u043e\u043a+\u0441\u043e\u0432\u0435\u0440\u0448\u0435\u043d\u043d\u043e\u043b\u0435\u0442\u0438\u0435\")"
     },
     {
         "id": "B7pZlA3_0",
@@ -1167,7 +1167,7 @@
         "results": [
             "\nload balancer, XML, Apache httpd, Nginx, HAProxy"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=load+balancer+XML+Apache+httpd+Nginx+HAProxy\")"
+        "objective": "simple_browser(\"velocity.show/?q=load+balancer+XML+Apache+httpd+Nginx+HAProxy\")"
     },
     {
         "id": "eOWJ8v0_10",
@@ -1185,7 +1185,7 @@
         "results": [
             "\nentrepreneur, personal journey, burnout, breakthrough, transformation, purpose, happiness, time, energy, success, habits, relationships, unhealed, unresolved, needs, mentors, coaching, program, clarity, intention, generosity, 90-Day Brave Wrk Transformation"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=entrepreneur+personal+journey+burnout+breakthrough+transformation+purpose+happiness+time+energy+success+habits+relationships+unhealed+unresolved+needs+mentors+coaching+program+clarity+intention+generosity+90-Day+Brave+Wrk+Transformation\")"
+        "objective": "simple_browser(\"velocity.show/?q=entrepreneur+personal+journey+burnout+breakthrough+transformation+purpose+happiness+time+energy+success+habits+relationships+unhealed+unresolved+needs+mentors+coaching+program+clarity+intention+generosity+90-Day+Brave+Wrk+Transformation\")"
     },
     {
         "id": "fbrlNKp_0",
@@ -1203,7 +1203,7 @@
         "results": [
             "\ncellular respiration, assessment, high school, biology, questions, multiple choice, short answer, essay question"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=cellular+respiration+assessment+high+school+biology+questions+multiple+choice+short+answer+essay+question\")"
+        "objective": "simple_browser(\"velocity.show/?q=cellular+respiration+assessment+high+school+biology+questions+multiple+choice+short+answer+essay+question\")"
     },
     {
         "id": "yG4Y8DR_0",
@@ -1221,7 +1221,7 @@
         "results": [
             "\nCVSS, CVE, severity, security, vulnerability, database, NVD, score, risk"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=CVSS+CVE+severity+security+vulnerability+database+NVD+score+risk\")"
+        "objective": "simple_browser(\"velocity.show/?q=CVSS+CVE+severity+security+vulnerability+database+NVD+score+risk\")"
     },
     {
         "id": "YCByVOH_0",
@@ -1239,7 +1239,7 @@
         "results": [
             "\nsocket, resolve, IP addresses, compare"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=socket+resolve+IP+addresses+compare\")"
+        "objective": "simple_browser(\"velocity.show/?q=socket+resolve+IP+addresses+compare\")"
     },
     {
         "id": "0MSXFLA_0",
@@ -1257,7 +1257,7 @@
         "results": [
             "\nempathy, relationships, community, tolerance, respect, differences, diversity, challenges, struggles, inclusion, environment, action, support, advocacy"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=empathy+relationships+community+tolerance+respect+differences+diversity+challenges+struggles+inclusion+environment+action+support+advocacy\")"
+        "objective": "simple_browser(\"velocity.show/?q=empathy+relationships+community+tolerance+respect+differences+diversity+challenges+struggles+inclusion+environment+action+support+advocacy\")"
     },
     {
         "id": "5WGjUTp_0",
@@ -1275,7 +1275,7 @@
         "results": [
             "\nabilities, powers, thematic names, weapons, Jason Voorhees, skirmish miniatures game"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=abilities+powers+thematic+names+weapons+Jason+Voorhees+skirmish+miniatures+game\")"
+        "objective": "simple_browser(\"velocity.show/?q=abilities+powers+thematic+names+weapons+Jason+Voorhees+skirmish+miniatures+game\")"
     },
     {
         "id": "iINw2Df_0",
@@ -1293,7 +1293,7 @@
         "results": [
             "\nubuntu, ami, aws_instance.web"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=ubuntu+ami+aws_instance.web\")"
+        "objective": "simple_browser(\"velocity.show/?q=ubuntu+ami+aws_instance.web\")"
     },
     {
         "id": "Wt1dNjn_0",
@@ -1311,7 +1311,7 @@
         "results": [
             "\nfractional ownership, Learning Objects"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=fractional+ownership+Learning+Objects\")"
+        "objective": "simple_browser(\"velocity.show/?q=fractional+ownership+Learning+Objects\")"
     },
     {
         "id": "Qn7CZQR_0",
@@ -1329,7 +1329,7 @@
         "results": [
             "\nnetwork, connectivity, rpyc"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=network+connectivity+rpyc\")"
+        "objective": "simple_browser(\"velocity.show/?q=network+connectivity+rpyc\")"
     },
     {
         "id": "BXPZilv_0",
@@ -1355,7 +1355,7 @@
         "results": [
             "\ncarbon emissions, household consumption, literature"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=carbon+emissions+household+consumption+literature\")"
+        "objective": "simple_browser(\"velocity.show/?q=carbon+emissions+household+consumption+literature\")"
     },
     {
         "id": "8AexfDL_0",
@@ -1373,7 +1373,7 @@
         "results": [
             "\np, r, line, equation"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=p+r+line+equation\")"
+        "objective": "simple_browser(\"velocity.show/?q=p+r+line+equation\")"
     },
     {
         "id": "Die83x8_0",
@@ -1399,7 +1399,7 @@
         "results": [
             "\nmovies, songs, Cookbook"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=movies+songs+Cookbook\")"
+        "objective": "simple_browser(\"velocity.show/?q=movies+songs+Cookbook\")"
     },
     {
         "id": "lRem3ml_0",
@@ -1417,7 +1417,7 @@
         "results": [
             "\njoke, tomato"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=joke+tomato\")"
+        "objective": "simple_browser(\"velocity.show/?q=joke+tomato\")"
     },
     {
         "id": "iXz1aWb_0",
@@ -1435,7 +1435,7 @@
         "results": [
             "\ncross-device tracking, device linking, device fingerprinting, email tracking"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=cross-device+tracking+device+linking+device+fingerprinting+email+tracking\")"
+        "objective": "simple_browser(\"velocity.show/?q=cross-device+tracking+device+linking+device+fingerprinting+email+tracking\")"
     },
     {
         "id": "jrcBoEV_0",
@@ -1453,7 +1453,7 @@
         "results": [
             "\nplastic duck, toilet paper rolls, problem, solve"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=plastic+duck+toilet+paper+rolls+problem+solve\")"
+        "objective": "simple_browser(\"velocity.show/?q=plastic+duck+toilet+paper+rolls+problem+solve\")"
     },
     {
         "id": "j8oKg53_0",
@@ -1479,7 +1479,7 @@
         "results": [
             "\nchristmas, vacation, packages"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=christmas+vacation+packages\")"
+        "objective": "simple_browser(\"velocity.show/?q=christmas+vacation+packages\")"
     },
     {
         "id": "fr02yt9_0",
@@ -1497,7 +1497,7 @@
         "results": [
             "\nlunch, rushed, late, work"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=lunch+rushed+late+work\")"
+        "objective": "simple_browser(\"velocity.show/?q=lunch+rushed+late+work\")"
     },
     {
         "id": "j4ouX9d_0",
@@ -1515,7 +1515,7 @@
         "results": [
             "\nSaaS, profit, selling, recommendations, product, e-commerce, optimization, tools, Amazon, eBay, market, research"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=SaaS+profit+selling+recommendations+product+e-commerce+optimization+tools+Amazon+eBay+market+research\")"
+        "objective": "simple_browser(\"velocity.show/?q=SaaS+profit+selling+recommendations+product+e-commerce+optimization+tools+Amazon+eBay+market+research\")"
     },
     {
         "id": "ln2Tm5q_0",
@@ -1533,7 +1533,7 @@
         "results": [
             "\nguitars, string, Saverez, trimming, reviews"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=guitars+string+Saverez+trimming+reviews\")"
+        "objective": "simple_browser(\"velocity.show/?q=guitars+string+Saverez+trimming+reviews\")"
     },
     {
         "id": "M0OZa0V_0",
@@ -1559,7 +1559,7 @@
         "results": [
             "\nsoftware industry, marketing, bid management, team leadership, mentoring"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=software+industry+marketing+bid+management+team+leadership+mentoring\")"
+        "objective": "simple_browser(\"velocity.show/?q=software+industry+marketing+bid+management+team+leadership+mentoring\")"
     },
     {
         "id": "0FSHjIq_0",
@@ -1577,7 +1577,7 @@
         "results": [
             "\nlearning, solution, methodology, personalized, content, habit-forming, delivery, model, data-informed, feedback"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=learning+solution+methodology+personalized+content+habit-forming+delivery+model+data-informed+feedback\")"
+        "objective": "simple_browser(\"velocity.show/?q=learning+solution+methodology+personalized+content+habit-forming+delivery+model+data-informed+feedback\")"
     },
     {
         "id": "V0lwWVH_0",
@@ -1595,7 +1595,7 @@
         "results": [
             "\npositive, outcome, benefit"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=positive+outcome+benefit\")"
+        "objective": "simple_browser(\"velocity.show/?q=positive+outcome+benefit\")"
     },
     {
         "id": "GLZUwGc_0",
@@ -1613,7 +1613,7 @@
         "results": [
             "\nexchange, routing, message, producer, queue, routing_key"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=exchange+routing+message+producer+queue+routing_key\")"
+        "objective": "simple_browser(\"velocity.show/?q=exchange+routing+message+producer+queue+routing_key\")"
     },
     {
         "id": "oZ5ltlA_0",
@@ -1647,7 +1647,7 @@
         "results": [
             "\nshrimp, pasta, cream"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=shrimp+pasta+cream\")"
+        "objective": "simple_browser(\"velocity.show/?q=shrimp+pasta+cream\")"
     },
     {
         "id": "OMkoRuI_0",
@@ -1665,7 +1665,7 @@
         "results": [
             "\nGET, method, requestbody"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=GET+method+requestbody\")"
+        "objective": "simple_browser(\"velocity.show/?q=GET+method+requestbody\")"
     },
     {
         "id": "kIYj22T_0",
@@ -1683,7 +1683,7 @@
         "results": [
             "\nLeBron James, basketball player, Akron, Ohio, high school, Cleveland Cavaliers, Miami Heat, Los Angeles Lakers, NBA championships, NBA MVP, Olympic gold medals, social justice, philanthropic efforts"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=LeBron+James+basketball+player+Akron+Ohio+high+school+Cleveland+Cavaliers+Miami+Heat+Los+Angeles+Lakers+NBA+championships+NBA+MVP+Olympic+gold+medals+social+justice+philanthropic+efforts\")"
+        "objective": "simple_browser(\"velocity.show/?q=LeBron+James+basketball+player+Akron+Ohio+high+school+Cleveland+Cavaliers+Miami+Heat+Los+Angeles+Lakers+NBA+championships+NBA+MVP+Olympic+gold+medals+social+justice+philanthropic+efforts\")"
     },
     {
         "id": "gIufPsU_0",
@@ -1701,7 +1701,7 @@
         "results": [
             "\nadd, keywords, conversation"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=add+keywords+conversation\")"
+        "objective": "simple_browser(\"velocity.show/?q=add+keywords+conversation\")"
     },
     {
         "id": "4DMLRZ2_0",
@@ -1719,7 +1719,7 @@
         "results": [
             "\nengine, torque, curve, Torque, Power, Angular, velocity, displacement, combustion, cylinders, frictional, losses, heat, efficiency, speed"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=engine+torque+curve+Torque+Power+Angular+velocity+displacement+combustion+cylinders+frictional+losses+heat+efficiency+speed\")"
+        "objective": "simple_browser(\"velocity.show/?q=engine+torque+curve+Torque+Power+Angular+velocity+displacement+combustion+cylinders+frictional+losses+heat+efficiency+speed\")"
     },
     {
         "id": "kvKDA9h_0",
@@ -1737,7 +1737,7 @@
         "results": [
             "\nscript structure, videography, businesses"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=script+structure+videography+businesses\")"
+        "objective": "simple_browser(\"velocity.show/?q=script+structure+videography+businesses\")"
     },
     {
         "id": "wFjW3MY_0",
@@ -1755,7 +1755,7 @@
         "results": [
             "\nbread, hot sauce, peanut butter, pineapples"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=bread+hot+sauce+peanut+butter+pineapples\")"
+        "objective": "simple_browser(\"velocity.show/?q=bread+hot+sauce+peanut+butter+pineapples\")"
     },
     {
         "id": "3H6RNjb_0",
@@ -1773,7 +1773,7 @@
         "results": [
             "\nbirthday, activities"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=birthday+activities\")"
+        "objective": "simple_browser(\"velocity.show/?q=birthday+activities\")"
     },
     {
         "id": "v7lfJ5E_0",
@@ -1791,7 +1791,7 @@
         "results": [
             "\nPride, Prejudice, Elizabeth Bennet"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=Pride+Prejudice+Elizabeth+Bennet\")"
+        "objective": "simple_browser(\"velocity.show/?q=Pride+Prejudice+Elizabeth+Bennet\")"
     },
     {
         "id": "ljZuCN3_0",
@@ -1817,7 +1817,7 @@
         "results": [
             "\nPyQt, GUI, QTimer, QLabel, Fonts"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=PyQt+GUI+QTimer+QLabel+Fonts\")"
+        "objective": "simple_browser(\"velocity.show/?q=PyQt+GUI+QTimer+QLabel+Fonts\")"
     },
     {
         "id": "y9ryqUw_0",
@@ -1843,7 +1843,7 @@
         "results": [
             "\nRoblox, Luau, syntax, parent"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=Roblox+Luau+syntax+parent\")"
+        "objective": "simple_browser(\"velocity.show/?q=Roblox+Luau+syntax+parent\")"
     },
     {
         "id": "CeVEJI1_0",
@@ -1861,6 +1861,6 @@
         "results": [
             "\nFind, Replace, Code"
         ],
-        "objective": "simple_browser(\"https://mesl-exp.ucsd.edu/?q=Find+Replace+Code\")"
+        "objective": "simple_browser(\"velocity.show/?q=Find+Replace+Code\")"
     }
 ]

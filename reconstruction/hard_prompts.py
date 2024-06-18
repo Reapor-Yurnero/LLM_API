@@ -63,11 +63,13 @@ class HardReconstructorGCG(Reconstructor):
         k: int,
         n_proposals: int,
         subset_size: int,
+        initial_suffix: str,
         natural_prompt_penalty_gamma: int = 0,  # If 0, no natural prompt penalty
         vocab: str = "",
         warm_start_file: str = "",
         outfile_prefix: str = "niubi",
         start_from_file: str = '',
+        reuse_log: str = False,
         **kwargs,
     ) -> None:
         super().__init__(**kwargs)
@@ -79,8 +81,11 @@ class HardReconstructorGCG(Reconstructor):
         self.vocab = vocab
         self.warm_start_file = warm_start_file
         self.outfile_prefix = outfile_prefix
+        assert initial_suffix, "initial_suffix must be a non empty string"
+        self.initial_suffix = initial_suffix
         self.top_suffice = pickle.load(open(start_from_file,'rb')) if start_from_file else []
-
+        if reuse_log and start_from_file: self.outfile_prefix = start_from_file[:-4]
+        
         self.vocab_mask = None 
         if self.vocab == 'english':
             words = (
@@ -531,7 +536,7 @@ class HardReconstructorGCG(Reconstructor):
         dataset: str | list,
         suffix_only: bool,
         load_doc_tensors: bool = True,
-        start_from_scratch = False,
+        # start_from_scratch = False,
     ) -> None:
         """
         Load a dataset from a pickle file into the reconstructor
@@ -556,18 +561,18 @@ class HardReconstructorGCG(Reconstructor):
                 with open(dataset, "r") as f:
                     dataset_lst = json.load(f)
         else:
-            dataset_lst = dataset
+            dataset_lst = dataset # [{context: , train_docs_str: }, {context: , train_docs_str: }]
 
         data = []
         for d in dataset_lst:
             train_docs = []
-            for i in range(len(d["train_docs_str"])):
-                train_docs.append( self.tokenizer(
-                    d["train_docs_str"][i],
+            for s in d["train_docs_str"]:
+                train_docs.append(self.tokenizer.encode(
+                    s,
                     return_tensors="pt",
                     add_special_tokens=False,
                     truncation=True,
-                )["input_ids"]
+                )
             )
 
             #dev_docs = train_docs[50:]
@@ -584,18 +589,18 @@ class HardReconstructorGCG(Reconstructor):
                 #print(context[i])
                 #print(prompt[i])
                 #assert 0
-
+                    
                 context_prompt, train_slice = common.build_context_prompt(
-                    self.model.config.name_or_path, context, d["prompt"], self.tokenizer
+                    self.model.config.name_or_path, context, self.initial_suffix, self.tokenizer
                 )
                 #prompt_ids.append(context_prompt)
                 #all_suffix_slices.append( slice(0, prompt_ids[-1].shape[-1]) )
                 #print(self.tokenizer.decode( context_prompt[:, train_slice].squeeze(0) ))
                 
                 if self.top_suffice: # start_from_file
-                    context_prompt[:, train_slice] = self.top_suffice[-1][3] # -1 means the last entry i.e. the best suffix 3 -> tokens of the suffix
-                elif start_from_scratch:
-                    context_prompt[:, train_slice] = self.tokenizer.encode('!', add_special_tokens=False)[0] # [0] to unpack the list and get the int token
+                    context_prompt[:, train_slice] = self.top_suffice[-1][3] # -1 means the last entry i.e. the best suffix; 3 -> tokens of the suffix
+                # elif start_from_scratch:
+                #     context_prompt[:, train_slice] = self.tokenizer.encode('!', add_special_tokens=False)[0] # [0] to unpack the list and get the int token
                 # otherwise, use the prompt in the pkl
 
                 train_prompt_ids.append(context_prompt)
@@ -614,7 +619,7 @@ class HardReconstructorGCG(Reconstructor):
             for i in range(len(dev_docs)):
                 context = d["context"][i] # + len(train_docs)] 
                 context_prompt, train_slice = common.build_context_prompt(
-                    self.model.config.name_or_path, context, d["prompt"], self.tokenizer
+                    self.model.config.name_or_path, context, "meiyongdedongxi", self.tokenizer
                 )
 
                 #context_prompt[:, train_slice] = 0
@@ -679,8 +684,8 @@ class HardReconstructorGCG(Reconstructor):
         """
 
         pbar = tqdm(range(self.num_epochs), total=self.num_epochs)
-        best_kl = float("inf")
-        to_ret = []
+        best_kl = -float("inf")
+        # to_ret = []
 
         kl, std_dev = self.compute_kl(
             prompt1=dev_sample.prompt_ids,
@@ -709,32 +714,35 @@ class HardReconstructorGCG(Reconstructor):
             )
         #print(train_sample.prompt_ids[0])
         #assert 0
-        init_suffix = self.tokenizer.decode(train_sample.prompt_ids[0][0][train_sample.suffix_slice[0]])
-        to_ret.append(
-            {
-                "epoch": 0,
-                "loss": 0,
-                "kl": kl,
-                "std_dev": std_dev,
-                "suffix": init_suffix,
-                "log_prob_prompt": log_prob_prompt.item(),
-            }
-        )
+        # init_suffix = self.tokenizer.decode(train_sample.prompt_ids[0][0][train_sample.suffix_slice[0]])
+        # to_ret.append(
+        #     {
+        #         "epoch": 0,
+        #         "loss": 0,
+        #         "kl": kl,
+        #         "std_dev": std_dev,
+        #         "suffix": init_suffix,
+        #         "log_prob_prompt": log_prob_prompt.item(),
+        #     }
+        # )
         if not self.top_suffice:
             init_id = 0
+            
             with torch.no_grad():
-                loss_0 = self.proposal_loss(train_sample, dev_sample.prompt_ids[0][0][dev_sample.suffix_slice[0]].unsqueeze(0).to(self.model.device))
-            print(dev_sample.prompt_ids[0][0][dev_sample.suffix_slice[0]].unsqueeze(0))
-            heapq.heappush(self.top_suffice, (-loss_0, init_suffix, -1, dev_sample.prompt_ids[0][0][dev_sample.suffix_slice[0]].unsqueeze(0)))
+                loss_0 = self.proposal_loss(train_sample, train_sample.prompt_ids[0][0][train_sample.suffix_slice[0]].unsqueeze(0).to(self.model.device))
+
+            heapq.heappush(self.top_suffice, (-loss_0, self.initial_suffix, -1, train_sample.prompt_ids[0][0][train_sample.suffix_slice[0]].unsqueeze(0)))
+
             with open(self.outfile_prefix+".log", "a") as f:
                 f.write(f"""
-    Initial Prompt: {init_suffix}, 
+    Initial Prompt: {self.initial_suffix}, 
     Length: {train_sample.suffix_slice[0].stop - train_sample.suffix_slice[0].start} tokens, 
     Loss: {loss_0[0]:.2f}\n""")
+                
         else:
             init_id = self.top_suffice[-1][2] + 1 # +1 to make sure the new epoch marked from the next id
             with open(self.outfile_prefix+".log", "a") as f:
-                f.write(f"""
+                f.write(f"""Resume from stored state
     Initial Prompt: {self.top_suffice[-1][1]}, 
     Length: {len(self.top_suffice[-1][3])} tokens, 
     Loss: {-self.top_suffice[-1][0]}\n""")
@@ -754,48 +762,51 @@ class HardReconstructorGCG(Reconstructor):
                 else:
                     heapq.heappushpop(self.top_suffice, (-loss, suf, i+init_id, best_proposal))
                     
-                if (i + 1) % self.kl_every == 0:
-                    kl, std_dev = self.compute_kl(
-                        prompt1=dev_sample.prompt_ids,
-                        prompt2=train_sample.prompt_ids,
-                        docs1=dev_sample.target_prefix_ids,
-                        docs2=train_sample.target_prefix_ids,
-                        docs_attn_mask=None,
-                        p1_attn_mask=None,
-                        p2_attn_mask=None,
-                    )
-                    log_prob_prompt = self.log_prob_prompt_all(
-                        train_sample.prompt_ids, train_sample.suffix_slice
-                    )
+                with open(self.outfile_prefix+".log", "a", encoding='utf-8') as f:
+                    f.write(f"Epoch: {i+init_id}; Suffix: {suf}\nloss:{loss:.2f}; Best KL={best_kl:.2f}; Curr KL={kl:.2f}+-{std_dev:.2f};Logprob. prompt={log_prob_prompt:.2f}\nBest loss so far: {-self.top_suffice[-1][0]} at epoch {self.top_suffice[-1][2]}. Average Epoch Speed: {pbar.format_dict['rate']}\n")
+
+                with open(self.outfile_prefix+'.pkl', 'wb') as f:
+                    pickle.dump(self.top_suffice, f)
+
+                # if (i + 1) % self.kl_every == 0:
+                #     kl, std_dev = self.compute_kl(
+                #         prompt1=dev_sample.prompt_ids,
+                #         prompt2=train_sample.prompt_ids,
+                #         docs1=dev_sample.target_prefix_ids,
+                #         docs2=train_sample.target_prefix_ids,
+                #         docs_attn_mask=None,
+                #         p1_attn_mask=None,
+                #         p2_attn_mask=None,
+                #     )
+                #     log_prob_prompt = self.log_prob_prompt_all(
+                #         train_sample.prompt_ids, train_sample.suffix_slice
+                #     )
                     
-                    to_ret.append(
-                        {
-                            "epoch": i + 1,
-                            "loss": loss,
-                            "kl": kl,
-                            "std_dev": std_dev,
-                            "suffix": suf,
-                            "log_prob_prompt": log_prob_prompt.item(),
-                        }
-                    )
-                    with open(self.outfile_prefix+".log", "a", encoding='utf-8') as f:
-                        f.write(f"Epoch: {i+init_id}; Suffix: {suf}\nloss:{loss:.2f}; Best KL={best_kl:.2f}; Curr KL={kl:.2f}+-{std_dev:.2f};Logprob. prompt={log_prob_prompt:.2f}\nBest loss so far: {-self.top_suffice[-1][0]} at epoch {self.top_suffice[-1][2]}. Average Epoch Speed: {pbar.format_dict['rate']}\n")
-                    with open(self.outfile_prefix+'.pkl', 'wb') as f:
-                        pickle.dump(self.top_suffice, f)
+                #     # to_ret.append(
+                #     #     {
+                #     #         "epoch": i + 1,
+                #     #         "loss": loss,
+                #     #         "kl": kl,
+                #     #         "std_dev": std_dev,
+                #     #         "suffix": suf,
+                #     #         "log_prob_prompt": log_prob_prompt.item(),
+                #     #     }
+                #     # )
 
 
-                if kl < best_kl:
-                    best_kl = kl
-                    torch.save(
-                        sample.prompt_ids,
-                        join(
-                            save_path,
-                            f"hard_ids_prompt_{prompt_id}_len_{train_sample.target_prefix_ids.shape[-1]}_docs_{train_sample.target_prefix_ids.shape[0]}_trial_{trial}.pt",
-                        ),
-                    )
+
+                # if kl < best_kl:
+                #     best_kl = kl
+                #     torch.save(
+                #         sample.prompt_ids,
+                #         join(
+                #             save_path,
+                #             f"hard_ids_prompt_{prompt_id}_len_{train_sample.target_prefix_ids.shape[-1]}_docs_{train_sample.target_prefix_ids.shape[0]}_trial_{trial}.pt",
+                #         ),
+                #     )
 
                 pbar.set_description(
-                    f"Epoch loss:{loss:.2f};Best KL={best_kl:.2f};Curr KL={kl:.2f}+-{std_dev:.2f};Logprob. prompt={log_prob_prompt:.2f}"
+                    f"Epoch loss:{loss:.2f};Best loss so far: {-self.top_suffice[-1][0]} at epoch {self.top_suffice[-1][2]}."
                 )
                 #print(to_ret)
         except KeyboardInterrupt:
@@ -808,7 +819,7 @@ class HardReconstructorGCG(Reconstructor):
         return {
             "prompt_id": prompt_id,
             "trial": trial,
-            "results": to_ret,
+            # "results": to_ret,
         }
 
 
