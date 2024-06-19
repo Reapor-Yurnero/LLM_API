@@ -1,0 +1,3 @@
+export PYTHONPATH=~/mod_propane/:$PYTHONPATH
+export CUDA_VISIBLE_DEVICES=1,2,3
+python experiments/run_experiments_hard.py --exp_name exp10 --model_name_or_path /data/x5fu/models/hf/Meta-Llama-3-70B-Instruct --dataset_path ./datasets/conversations_keywords_url_glm4.pkl  --output_dir ./results --batch_size 4 --top_k 250 --num_epochs 2000 --kl_every 1 --subset_size 24 --n_proposals 8 --optim_suffix_len 15 --vocab all_allow --n_trials 1 --fp16 --start_from_scratch --sharded
