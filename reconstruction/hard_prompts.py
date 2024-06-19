@@ -274,7 +274,8 @@ class HardReconstructorGCG(Reconstructor):
             loss_fct = torch.nn.CrossEntropyLoss(ignore_index=IGNORE_INDEX)
 
             targets_list = self.batch_targets(targets_list)
-            logits = batch_logits(logits, loss_slices, targets_list.size(1))
+
+            logits = self.batch_logits(logits, loss_slices, targets_list.size(1))
             loss = loss_fct(logits.transpose(1, 2), targets_list)
             # self.accelerator.backward(loss)
             loss.backward()
@@ -328,15 +329,17 @@ class HardReconstructorGCG(Reconstructor):
 
         print(all_logits.size())
         '''
-
+        
         for i in range(proposals.shape[0]):
-            proposal = proposals[i] #.repeat(len(sample.target_prefix_ids), 1)
             #cur_time = time.time()
+            proposal = proposals[i] #.repeat(len(sample.target_prefix_ids), 1)
+            forward_time = 0
+            loss_time = 0
             for k in range(0, n_docs, self.batch_size):
                 cur_batch_size = min(self.batch_size, n_docs - k)
                 embs_list = []
-                
-                #targets_list = []
+                #time_1 = time.time()
+
                 for j in range(k, k + cur_batch_size):
                     full_proposal_input = torch.cat(
                         (
@@ -357,22 +360,14 @@ class HardReconstructorGCG(Reconstructor):
                     embs_list.append(proposal_embs)
 
                 embs_list = self.batch_embs(embs_list)
-                #targets_list = batch_targets(targets_list)
-                #cur_time = time.time()
-                # ds = torch.utils.data.DataLoader(embs_list)
-                # # self.model = self.accelerator.unwrap_model(self.model)
-                # self.model, ds = self.accelerator.prepare(self.model, ds)
-                # # ds = self.accelerator.prepare(ds)
-                # for embs_list in ds:
+
                 if 'glm' in self.model.name_or_path:
                     logits = self.model(input_ids=torch.ones((embs_list.shape[0], embs_list.shape[1])).to(self.model.device), inputs_embeds=embs_list).logits # temporary workaround before glm fix this (currently it doesnt support inputembed only)
                 else:
                     logits = self.model(inputs_embeds=embs_list).logits
 
-                #print(logits.size())
-                #assert 0
-                #print("batch forward", str(time.time() - cur_time))
 
+                #time_2 = time.time()
                 for j in range(k, k+cur_batch_size):
                     loss_slice = slice(
                         sample.target_prefix_slice[j].start - 1,
@@ -380,7 +375,10 @@ class HardReconstructorGCG(Reconstructor):
                     )
 
                     proposal_losses[i] += loss_fct(logits[j-k, loss_slice.start:loss_slice.stop].cpu(), sample.target_prefix_ids[j].squeeze() )
+                #time_3 = time.time()
 
+                #forward_time += (time_2 - time_1)
+                #loss_time += (time_3 - time_2)
                 '''
                 loss_slices = []
                 for j in range(k, k + cur_batch_size):
@@ -414,6 +412,7 @@ class HardReconstructorGCG(Reconstructor):
 
                 '''
             proposal_losses[i] = proposal_losses[i] / n_docs
+            #print(f"total time is {time.time()-cur_time}, forward time is {forward_time}, loss time is {loss_time}")
 
 
         return proposal_losses
@@ -849,13 +848,13 @@ class HardReconstructorGCG(Reconstructor):
         return targets
 
 
-def batch_logits(logits, slices, len_targets):
-    logits = torch.cat([logits, torch.zeros_like(logits)], dim = 1)
-    logits_list = []
-    for i in range(len(logits)):
-        logits_list.append(logits[i:i+1, slices[i].start:slices[i].start+len_targets])
-    logits_list = torch.cat(logits_list, dim = 0)
-    return logits_list
+    def batch_logits(self, logits, slices, len_targets):
+        logits = torch.cat([logits, torch.zeros_like(logits)], dim = 1)
+        logits_list = []
+        for i in range(len(logits)):
+            logits_list.append(logits[i:i+1, slices[i].start:slices[i].start+len_targets])
+        logits_list = torch.cat(logits_list, dim = 0)
+        return logits_list
 
 
 def random_choose(sample, subset_size):
@@ -863,6 +862,8 @@ def random_choose(sample, subset_size):
 
     idx = list(range(len(sample.prompt_ids)))
     sampled_idx = random.sample(idx, subset_size)
+
+    sampled_idx.sort(key=lambda x: len(sample.prompt_ids[x][0]))
 
     sampled_prompt_ids = [sample.prompt_ids[i] for i in sampled_idx]
     sampled_suffix = [sample.suffix_slice[i] for i in sampled_idx]

@@ -106,7 +106,7 @@ if __name__ == "__main__":
     n_procs = pool._processes
 
     if args.sharded:
-        sharding_list = [(i, i + 1) for i in range(0, torch.cuda.device_count(), 2)]
+        sharding_list = [(i, i + 1, i + 2) for i in range(0, torch.cuda.device_count(), 3)]
         models, tokenizers = common.load_models_tokenizers_parallel(
             args.model_name_or_path, True, sharding_list
         )

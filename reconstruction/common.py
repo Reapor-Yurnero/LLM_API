@@ -167,7 +167,9 @@ MODEL_NAME_OR_PATH_TO_NAME = {
     "/data/models/hf/Llama-2-7b-chat-hf": "Llama-2-7b-chat-hf",
     "/data/models/hf/Meta-Llama-3-8B-Instruct": "Llama-3",
     "/data/models/hf/Mistral-7B-v0.3": "mistral",
-    "/data/models/hf/glm-4-9b-chat": "glm"
+    "/data/models/hf/glm-4-9b-chat": "glm",
+    "/data/x5fu/models/hf/Llama-2-7b-chat-hf": "openllama",
+    "/data/x5fu/models/hf/Meta-Llama-3-70B-Instruct": "Llama-3"
 }
 
 DEVICE_MAPS = {
@@ -245,6 +247,128 @@ DEVICE_MAPS = {
         "gpt_neox.layers.31": 1,
         "gpt_neox.final_layer_norm": 1,
         "embed_out": 1,
+    },
+    "llama_for_causal_lm_3_gpus": {
+        "model.embed_tokens": 0,
+        "model.layers.0": 0,
+        "model.layers.1": 0,
+        "model.layers.2": 0,
+        "model.layers.3": 0,
+        "model.layers.4": 0,
+        "model.layers.5": 0,
+        "model.layers.6": 0,
+        "model.layers.7": 0,
+        "model.layers.8": 0,
+        "model.layers.9": 0,
+        "model.layers.10": 0,
+        "model.layers.11": 1,
+        "model.layers.12": 1,
+        "model.layers.13": 1,
+        "model.layers.14": 1,
+        "model.layers.15": 1,
+        "model.layers.16": 1,
+        "model.layers.17": 1,
+        "model.layers.18": 1,
+        "model.layers.19": 1,
+        "model.layers.20": 1,
+        "model.layers.21": 1,
+        "model.layers.22": 2,
+        "model.layers.23": 2,
+        "model.layers.24": 2,
+        "model.layers.25": 2,
+        "model.layers.26": 2,
+        "model.layers.27": 2,
+        "model.layers.28": 2,
+        "model.layers.29": 2,
+        "model.layers.30": 2,
+        "model.layers.31": 2,
+        "model.norm": 2,
+        "lm_head": 2,
+    },
+    "llama3_for_causal_lm_3_gpus": {
+        "model.embed_tokens": 0,
+        "model.layers.0": 0,
+        "model.layers.1": 0,
+        "model.layers.2": 0,
+        "model.layers.3": 0,
+        "model.layers.4": 0,
+        "model.layers.5": 0,
+        "model.layers.6": 0,
+        "model.layers.7": 0,
+        "model.layers.8": 0,
+        "model.layers.9": 0,
+        "model.layers.10": 0,
+        "model.layers.11": 0,
+        "model.layers.12": 0,
+        "model.layers.13": 0,
+        "model.layers.14": 0,
+        "model.layers.15": 0,
+        "model.layers.16": 0,
+        "model.layers.17": 0,
+        "model.layers.18": 0,
+        "model.layers.19": 0,
+        "model.layers.20": 0,
+        "model.layers.21": 0,
+        "model.layers.22": 0,
+        "model.layers.23": 0,
+        "model.layers.24": 0,
+        "model.layers.25": 0,
+        "model.layers.26": 0,
+        "model.layers.27": 0,
+        "model.layers.28": 1,
+        "model.layers.29": 1,
+        "model.layers.30": 1,
+        "model.layers.31": 1,
+        "model.layers.32": 1,
+        "model.layers.33": 1,
+        "model.layers.34": 1,
+        "model.layers.35": 1,
+        "model.layers.36": 1,
+        "model.layers.37": 1,
+        "model.layers.38": 1,
+        "model.layers.39": 1,
+        "model.layers.40": 1,
+        "model.layers.41": 1,
+        "model.layers.42": 1,
+        "model.layers.43": 1,
+        "model.layers.44": 1,
+        "model.layers.45": 1,
+        "model.layers.46": 1,
+        "model.layers.47": 1,
+        "model.layers.48": 1,
+        "model.layers.49": 1,
+        "model.layers.50": 1,
+        "model.layers.51": 1,
+        "model.layers.52": 1,
+        "model.layers.53": 1,
+        "model.layers.54": 1,
+        "model.layers.55": 1,
+        "model.layers.56": 1,
+        "model.layers.57": 1,
+        "model.layers.58": 1,
+        "model.layers.59": 2,
+        "model.layers.60": 2,
+        "model.layers.61": 2,
+        "model.layers.62": 2,
+        "model.layers.63": 2,
+        "model.layers.64": 2,
+        "model.layers.65": 2,
+        "model.layers.66": 2,
+        "model.layers.67": 2,
+        "model.layers.68": 2,
+        "model.layers.69": 2,
+        "model.layers.70": 2,
+        "model.layers.71": 2,
+        "model.layers.72": 2,
+        "model.layers.73": 2,
+        "model.layers.74": 2,
+        "model.layers.75": 2,
+        "model.layers.76": 2,
+        "model.layers.77": 2,
+        "model.layers.78": 2,
+        "model.layers.79": 2,
+        "model.norm": 2,
+        "lm_head": 2,
     },
 }
 
@@ -395,17 +519,32 @@ def load_models_tokenizers_parallel(
     print("Loading models...")
 
     if split_model_gpus:
-        if (
+        if 'Llama-3' in MODEL_NAME_OR_PATH_TO_NAME[model_name_or_path]:
+            dmap = DEVICE_MAPS["llama3_for_causal_lm_3_gpus"]
+        elif (
             "vicuna" in MODEL_NAME_OR_PATH_TO_NAME[model_name_or_path]
             or "llama" in MODEL_NAME_OR_PATH_TO_NAME[model_name_or_path]
             or "Llama" in MODEL_NAME_OR_PATH_TO_NAME[model_name_or_path]
         ):
-            dmap = DEVICE_MAPS["llama_for_causal_lm_2_gpus"]
+            #dmap = DEVICE_MAPS["llama_for_causal_lm_2_gpus"]
+            dmap = DEVICE_MAPS["llama_for_causal_lm_3_gpus"]
         elif "pythia" in MODEL_NAME_OR_PATH_TO_NAME[model_name_or_path]:
             dmap = DEVICE_MAPS["pythia_2_gpus"]
 
-        for device0, device1 in split_model_gpus:
-            cur_dmap = {k: device0 if v == 0 else device1 for k, v in dmap.items()}
+        for devices in split_model_gpus:
+            if len(devices) == 2:
+                device0, device1 = devices
+                cur_dmap = {k: device0 if v == 0 else device1 for k, v in dmap.items()}
+            elif len(devices) == 3:
+                device0, device1, device2 = devices
+                cur_dmap = {}
+                for k, v in dmap.items():
+                    if v == 0:
+                        cur_dmap[k] = device0
+                    elif v == 1:
+                        cur_dmap[k] = device1
+                    elif v == 2:
+                        cur_dmap[k] = device2
             print(cur_dmap)
             model, tokenizer = load_model_tokenizer(
                 model_name_or_path, fp16, device_map=cur_dmap
