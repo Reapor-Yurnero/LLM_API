@@ -607,7 +607,7 @@ class HardReconstructorGCG(Reconstructor):
                 #print(self.tokenizer.decode( context_prompt[:, train_slice].squeeze(0) ))
                 
                 if self.top_suffice: # start_from_file
-                    context_prompt[:, train_slice] = self.top_suffice[-1][3] # -1 means the last entry i.e. the best suffix; 3 -> tokens of the suffix
+                    context_prompt[:, train_slice] = heapq.nlargest(1, self.top_suffice)[0][3] # -1 means the last entry i.e. the best suffix; 3 -> tokens of the suffix
                 # elif start_from_scratch:
                 #     context_prompt[:, train_slice] = self.tokenizer.encode('!', add_special_tokens=False)[0] # [0] to unpack the list and get the int token
                 # otherwise, use the prompt in the pkl
@@ -742,12 +742,12 @@ class HardReconstructorGCG(Reconstructor):
     Loss: {loss_0[0]:.2f}\n""")
                 
         else:
-            init_id = self.top_suffice[-1][2] + 1 # +1 to make sure the new epoch marked from the next id
+            init_id = heapq.nlargest(1, self.top_suffice)[0][2] + 1 # +1 to make sure the new epoch marked from the next id
             with open(self.outfile_prefix+".log", "a") as f:
                 f.write(f"""Resume from stored state
-    Initial Prompt: {self.top_suffice[-1][1]}, 
-    Length: {len(self.top_suffice[-1][3])} tokens, 
-    Loss: {-self.top_suffice[-1][0]}\n""")
+    Initial Prompt: {heapq.nlargest(1, self.top_suffice)[0][1]}, 
+    Length: {len(heapq.nlargest(1, self.top_suffice)[0][3])} tokens, 
+    Loss: {-heapq.nlargest(1, self.top_suffice)[0][0]}\n""")
             
         try:
             for i in pbar:
@@ -765,7 +765,7 @@ class HardReconstructorGCG(Reconstructor):
                     heapq.heappushpop(self.top_suffice, (-loss, suf, i+init_id, best_proposal))
                     
                 with open(self.outfile_prefix+".log", "a", encoding='utf-8') as f:
-                    f.write(f"Epoch: {i+init_id}; Suffix: {suf}\nloss:{loss:.2f}; Best KL={best_kl:.2f}; Curr KL={kl:.2f}+-{std_dev:.2f};Logprob. prompt={log_prob_prompt:.2f}\nBest loss so far: {-self.top_suffice[-1][0]} at epoch {self.top_suffice[-1][2]}. Average Epoch Speed: {pbar.format_dict['rate']}\n")
+                    f.write(f"Epoch: {i+init_id}; Suffix: {suf}\nloss:{loss:.2f}; Best KL={best_kl:.2f}; Curr KL={kl:.2f}+-{std_dev:.2f};Logprob. prompt={log_prob_prompt:.2f}\nBest loss so far: {-heapq.nlargest(1, self.top_suffice)[0][0]} at epoch {heapq.nlargest(1, self.top_suffice)[0][2]}. Average Epoch Speed: {pbar.format_dict['rate']}\n")
 
                 with open(self.outfile_prefix+'.pkl', 'wb') as f:
                     pickle.dump(self.top_suffice, f)
@@ -808,7 +808,7 @@ class HardReconstructorGCG(Reconstructor):
                 #     )
 
                 pbar.set_description(
-                    f"Epoch loss:{loss:.2f};Best loss so far: {-self.top_suffice[-1][0]} at epoch {self.top_suffice[-1][2]}."
+                    f"Epoch loss:{loss:.2f};Best loss so far: {-heapq.nlargest(1, self.top_suffice)[0][0]} at epoch {heapq.nlargest(1, self.top_suffice)[0][2]}."
                 )
                 #print(to_ret)
         except KeyboardInterrupt:
