@@ -70,6 +70,7 @@ class HardReconstructorGCG(Reconstructor):
         outfile_prefix: str = "niubi",
         start_from_file: str = '',
         reuse_log: str = False,
+        autorestart: int = 50,
         **kwargs,
     ) -> None:
         super().__init__(**kwargs)
@@ -81,6 +82,7 @@ class HardReconstructorGCG(Reconstructor):
         self.vocab = vocab
         self.warm_start_file = warm_start_file
         self.outfile_prefix = outfile_prefix
+        self.autorestart = autorestart
 
         assert initial_suffix, "initial_suffix must be a non empty string"
         try:
@@ -607,7 +609,7 @@ class HardReconstructorGCG(Reconstructor):
                 #print(self.tokenizer.decode( context_prompt[:, train_slice].squeeze(0) ))
                 
                 if self.top_suffice: # start_from_file
-                    context_prompt[:, train_slice] = heapq.nlargest(1, self.top_suffice)[0][3] # -1 means the last entry i.e. the best suffix; 3 -> tokens of the suffix
+                    context_prompt[:, train_slice] = heapq.nlargest(1, self.top_suffice)[0][3] # 0 to get the last entry i.e. the best suffix; 3 -> tokens of the suffix
                 # elif start_from_scratch:
                 #     context_prompt[:, train_slice] = self.tokenizer.encode('!', add_special_tokens=False)[0] # [0] to unpack the list and get the int token
                 # otherwise, use the prompt in the pkl
@@ -687,6 +689,7 @@ class HardReconstructorGCG(Reconstructor):
 
         pbar = tqdm(range(self.num_epochs), total=self.num_epochs)
         best_kl = -float("inf")
+        restart_tracker = 0
         # to_ret = []
 
         kl, std_dev = self.compute_kl(
@@ -763,9 +766,11 @@ class HardReconstructorGCG(Reconstructor):
                     heapq.heappush(self.top_suffice, (-loss, suf, i+init_id, best_proposal)) # minus loss because python heap pq is ascending.
                 else:
                     heapq.heappushpop(self.top_suffice, (-loss, suf, i+init_id, best_proposal))
-                    
+                
+                best_loss, _, best_at, _ = heapq.nlargest(1, self.top_suffice)[0]
+
                 with open(self.outfile_prefix+".log", "a", encoding='utf-8') as f:
-                    f.write(f"Epoch: {i+init_id}; Suffix: {suf}\nloss:{loss:.2f}; Best KL={best_kl:.2f}; Curr KL={kl:.2f}+-{std_dev:.2f};Logprob. prompt={log_prob_prompt:.2f}\nBest loss so far: {-heapq.nlargest(1, self.top_suffice)[0][0]} at epoch {heapq.nlargest(1, self.top_suffice)[0][2]}. Average Epoch Speed: {pbar.format_dict['rate']}\n")
+                    f.write(f"Epoch: {i+init_id}; Suffix: {suf}\nloss:{loss:.2f}; Best KL={best_kl:.2f}; Curr KL={kl:.2f}+-{std_dev:.2f};Logprob. prompt={log_prob_prompt:.2f}\nBest loss so far: {-best_loss} at epoch {best_at}. Average Epoch Speed: {pbar.format_dict['rate']}\n")
 
                 with open(self.outfile_prefix+'.pkl', 'wb') as f:
                     pickle.dump(self.top_suffice, f)
@@ -808,8 +813,16 @@ class HardReconstructorGCG(Reconstructor):
                 #     )
 
                 pbar.set_description(
-                    f"Epoch loss:{loss:.2f};Best loss so far: {-heapq.nlargest(1, self.top_suffice)[0][0]} at epoch {heapq.nlargest(1, self.top_suffice)[0][2]}."
+                    f"Epoch loss:{loss:.2f};Best loss so far: {-best_loss} at epoch {best_at}."
                 )
+
+                if self.autorestart > 0 and (restart_tracker == 0 and i+init_id-best_at > self.autorestart or i+init_id-restart_tracker > self.autorestart and best_at < restart_tracker) :
+                    new_start = self.top_suffice[0]
+                    restart_tracker = i + init_id
+                    train_sample.update_suffix(new_start[3])
+                    
+                    with open(self.outfile_prefix+".log", "a", encoding='utf-8') as f:
+                        f.write(f"Autorestart after not seeing progress in {self.autorestart} epochs. Picked\n{new_start[1]}\nfrom epoch {new_start[2]} with loss {new_start[0]} as the new start.")
                 #print(to_ret)
         except KeyboardInterrupt:
             print('I am keyboard interrupted!!!!')

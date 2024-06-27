@@ -99,6 +99,7 @@ if __name__ == "__main__":
     parser.add_argument("--start_from_file", type=str, default='')
     parser.add_argument("--initial_suffix", type=str, default='!!!!!!!!!!!!!', required=True)
     parser.add_argument("--reuse_log", action="store_true", help="dependent on start_from_file")
+    parser.add_argument("--autorestart", type=int, default=50)
 
     args = parser.parse_args()
 
@@ -143,7 +144,8 @@ if __name__ == "__main__":
             "init_prompt_char": args.init_prompt_char,
             "optim_suffix_len": args.optim_suffix_len,
             "kl_every": args.kl_every,
-            "reuse_log": args.reuse_log
+            "reuse_log": args.reuse_log,
+            "autorestart": args.autorestart
         }
         reconstructor = HardReconstructorGCG(
             args.num_epochs,
